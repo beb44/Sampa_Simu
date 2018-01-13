@@ -100,13 +100,14 @@ bool dualsampa::serial_available()
     // if user handler available, call it to regenerate date
     if (user_handler) 
     {  
-      if ((data_regenerated))
+     // if ((data_regenerated))
       {
-        user_handler(internal_ref);
         data_regenerated = false;
+        user_handler(internal_ref);
+        return data_regenerated;
       }	
     }
-    return false;
+    //return false;
   }
  //if (send_credit == 0) return false;
   //return (sampas[0]->serial_available() || sampas[1]->serial_available());
