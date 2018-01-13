@@ -31,7 +31,7 @@ void reciever::handle_packet(const uint64_t header,int len,uint16_t *buffer)
 sampa_head  head_decoder(header);
 
   head_decoder.decode();
-  head_decoder.display();
+  //head_decoder.display();
   if (user_handler) user_handler(head_decoder.fChipAddress,
   			         head_decoder.fChannelAddress,
 				 0,
@@ -91,9 +91,9 @@ void reciever::process()
 	   if (cur_len == payload_length) 
 	   {
 	     headcd = 50; // 50 bit of header to be read
-	     cout << "complete data packet received" << endl;
-             for (int i=0;i<cur_len;i++) cout << _frame[i] << " " ; 
-             cout << endl;
+	     //cout << "complete data packet received" << endl;
+             //for (int i=0;i<cur_len;i++) cout << _frame[i] << " " ; 
+             //cout << endl;
 	     handle_packet(curhead,payload_length,_frame);
 	   }
          }
