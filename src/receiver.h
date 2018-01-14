@@ -1,5 +1,6 @@
 #ifndef RECEIVER
 #define RECEIVER
+#include <thread>
 #include "sampa_head.h"
 #include "Elink.h"
 class receiver
@@ -8,6 +9,8 @@ public:
   receiver();
   receiver(elink *p);
   void set_userhandler(void (*foo)(int,int,int,int,int,short *));
+  void start();
+  void join();
   void process();
 private:
   void (*user_handler)(int,int,int,int,int,short *);
@@ -26,6 +29,8 @@ private:
   uint16_t  cur_len;
   uint16_t  *_wpointer;
   uint16_t  _frame[1024];
+  
+  std::thread  *TheThread;
   
 };
 #endif

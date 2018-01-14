@@ -1,5 +1,6 @@
 #include <iostream>
 #include <bitset>
+#include <thread>
 #include "receiver.h"
 
 using namespace std;
@@ -21,6 +22,16 @@ receiver::receiver(elink *p)
   synchead = sampa_head().build_sync();
   syncpos = 0;
   curhead = 0;
+}
+
+void receiver::start()
+{
+  TheThread = new std::thread(&receiver::process,this);
+}
+
+void receiver::join()
+{
+  TheThread->join();
 }
 void receiver::set_userhandler(void (*foo)(int,int,int,int,int,short *))
 {
@@ -108,9 +119,9 @@ void receiver::process()
  //     std::bitset<50> (synchead) << endl;
       if (curhead == synchead)
       {
-        cout << syncpos << " "<< std::bitset<50>( curhead ) << "payload length " << payload_length << endl;
+        // cout << syncpos << " "<< std::bitset<50>( curhead ) << "payload length " << payload_length << endl;
         issync= true;
-	cout <<"receiver: Synchronisation trouvee au bit" << (syncpos-50) << endl;   
+	// cout <<"receiver: Synchronisation trouvee au bit" << (syncpos-50) << endl;   
 	headcd = 50; // 50 bit of header to be read
       }	
     }
