@@ -11,8 +11,8 @@ dualsampa::dualsampa(uint8_t addr1,uint8_t addr2)
   sampas[1] = new sampa(addr2);  
   
   syncpacket     = sampa_head().build_sync();
-  sync_countdown = 0; // no sync packet to be sent (for the moment)
-  send_credit    = 8192; // 8192 bit to be sent per window 
+  sync_countdown = 50; // no sync packet to be sent (for the moment)
+  send_credit    = 0; // 8192 bit to be sent per window 
                          //(10 mhz sampling rate)
   internal_ref = 0;
   user_handler = 0;
@@ -32,8 +32,6 @@ void dualsampa::set_internal_ref(int ref)
 void dualsampa::set_user_handler(void (*uh)(int))
 {
   user_handler = uh;
-  // call user handler to initiate process
-  uh(internal_ref);
 }
 void dualsampa::select_channel(const uint8_t sId,const uint8_t chid)
 {
