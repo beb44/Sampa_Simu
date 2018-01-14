@@ -12,7 +12,7 @@
 class dualsampa final : public elink
 {
 public:
-  dualsampa(uint8_t addr1,uint8_t addr2);
+  dualsampa(uint16_t addr1,uint16_t addr2);
   ~dualsampa();
   void set_internal_ref(int ref);
   void set_user_handler(void (*uh)(int));

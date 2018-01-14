@@ -4,7 +4,7 @@
 #include "sampa_head.h"
 using namespace std;
 
-dualsampa::dualsampa(uint8_t addr1,uint8_t addr2)
+dualsampa::dualsampa(uint16_t addr1,uint16_t addr2)
 {
   // creates the two samaps
   sampas[0] = new sampa(addr1);
