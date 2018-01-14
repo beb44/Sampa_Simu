@@ -2,7 +2,7 @@
 #include <cstdint>
 #include "sampa.h"
 #include "dualsampa.h"
-#include "reciever.h"
+#include "receiver.h"
 #include "manitou.h"
 #include "interface.h"
 
@@ -10,7 +10,7 @@ using namespace std;
 
 sampa sampa_0(0);
 dualsampa ds(10,12);
-reciever rec(&ds);
+receiver rec(&ds);
 int dsid =0;
 int loop = 50000;//00000;
 
@@ -61,24 +61,6 @@ int main()
   rec.set_userhandler(rec_handler);
   rec.process();
   cout <<"hello  "<<endl;
-#if 0  
-  ds.reset_frames();
-  ds.add_data(0,4,data);
-  ds.add_data(0,4,data);
-  ds.send_frames();
-  ds.make_sync(0);
-  ds.send_frames();
-  ds.reset_frames();
-  ds.select_channel(0,0);  // channel 0
-  ds.add_data(0,4,data);
-  ds.add_data(0,4,data);
-  ds.send_frames();
-  ds.reset_frames();
-  ds.select_channel(0,5);  // channel 5
-  ds.add_data(0,4,data);
-  ds.add_data(1,4,data);
-  ds.send_frames();
-#endif
  // rec.process();
  for (int i=0;i<1;i++)
  {

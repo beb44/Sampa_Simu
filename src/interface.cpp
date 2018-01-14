@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include "sampa.h"
 #include "dualsampa.h"
-#include "reciever.h"
+#include "receiver.h"
 #include "manitou.h"
 
 /*!
