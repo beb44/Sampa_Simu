@@ -8,12 +8,31 @@
 
 using namespace std;
 
+#define  NBT 200
+
 sampa sampa_0(0);
 dualsampa ds(10,12);
 receiver rec(&ds);
 int dsid =0;
 int loop = 50000;//00000;
+dualsampa *dsarr[NBT];
+receiver  *recarr[NBT];
+int looparr[NBT];
 
+void dsp_handlerarr(int ref)
+{
+uint16_t data[4] = {7,2,0x1,0x20}; 
+
+  if (--looparr[ref] == 0)return;
+  for (int i = 0;i<32;i++)
+  {
+    dsarr[ref]->select_channel(0,i);
+    dsarr[ref]->reset_frames();
+    dsarr[ref]->add_data(0,4,data);
+    dsarr[ref]->send_frames();
+  }
+  dsarr[ref]->regenerate_data();
+}
 void dsp_handler(int ref)
 {
 uint16_t data[4] = {7,2,0x1,0x20}; 
@@ -56,10 +75,24 @@ void rec_handler(int addr,int ch,int nbsamp,int ts,int len, short *buff)
 int main()
 {
 
-
+#if 0
   ds.set_user_handler(dsp_handler);
   rec.set_userhandler(rec_handler);
-  rec.process();
+  rec.start();
+  rec.join();
+#endif
+  for (int i=0; i< NBT;i++)
+  {
+    looparr[i]= 10000;
+    dsarr[i] = new dualsampa(i*2,i*2+1);
+    dsarr[i]->set_internal_ref(i);
+    dsarr[i]->set_user_handler(dsp_handlerarr);
+    recarr[i] = new receiver(dsarr[i]);
+    recarr[i]->set_userhandler(rec_handler);
+  }
+  for (int i=0; i< NBT;i++) recarr[i]->start();
+  for (int i=0; i< NBT;i++) recarr[i]->join();
+  
   cout <<"hello  "<<endl;
  // rec.process();
  for (int i=0;i<1;i++)
