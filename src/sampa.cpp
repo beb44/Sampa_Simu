@@ -11,7 +11,7 @@ using namespace std;
  *
  *  \param addr : hardware address of the sampa chip
  */
-sampa::sampa(uint8_t addr)
+sampa::sampa(uint16_t addr)
 {
   cout <<"Sampa " << (int)addr << " created " << endl;
   Haddr = addr;

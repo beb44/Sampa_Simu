@@ -12,7 +12,7 @@
 class sampa final : public elink
 {
 public:
-  sampa(uint8_t addr);
+  sampa(uint16_t addr);
   ~sampa();
   void select_channel(const uint8_t chid);
   void reset_frame();
