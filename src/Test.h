@@ -24,7 +24,7 @@ public:
   std::chrono::time_point<std::chrono::system_clock> cend;
   int  _nbthread ;
   int  _nbloop  ;
-  char *title;
+  std::string  title;
 };
 class Test1: public Test
 {
