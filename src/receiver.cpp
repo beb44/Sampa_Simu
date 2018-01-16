@@ -33,6 +33,11 @@ receiver::receiver(elink *p)
 #endif
 }
 
+receiver::receiver(int port,GBT_r *p)
+{
+  peer = p->get_elink(port);
+}
+
 void receiver::start()
 {
   TheThread = new std::thread(&receiver::process,this);

@@ -3,9 +3,9 @@
 #include <cstdint>
 #include <bitset>
 #include <list>
-#include "Elink.h"
+#include "GBTlink.h"
 
-class GBT_s
+class GBT_s: public gbtlink
 {
 public:
   GBT_s();
