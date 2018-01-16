@@ -13,6 +13,7 @@ receiver::receiver()
   synchead = sampa_head().build_sync();
   curhead = 0;
   user_handler = 0;
+  rec_handl = 0;
 #ifdef STATS
   reset_stats();
 #endif
@@ -25,6 +26,8 @@ receiver::receiver(elink *p)
   synchead = sampa_head().build_sync();
   syncpos = 0;
   curhead = 0;
+  user_handler = 0;
+  rec_handl = 0;
 #ifdef STATS
   reset_stats();
 #endif
@@ -47,6 +50,12 @@ void receiver::set_userhandler(void (*foo)(int,int,int,int,int,short *))
 {
   user_handler=foo;
 }
+
+void receiver::set_userhandler(receiver_handler *handler)
+{
+  rec_handl=handler;
+}
+
 void receiver::handle_packet(const uint64_t header,int len,uint16_t *buffer)
 {
 sampa_head  head_decoder(header);
@@ -60,9 +69,14 @@ sampa_head  head_decoder(header);
 				 buffer[1],
 				 (short *)&buffer[2]);
 				 
-                             
+  if (rec_handl) rec_handl->rec_handler(head_decoder.fChipAddress,
+  			         head_decoder.fChannelAddress,
+				 0,
+				 buffer[0],
+				 buffer[1],
+				 (short *)&buffer[2]);
+				
 }
-
 void receiver::process()
 {  
   if (peer == (elink *)0) return;

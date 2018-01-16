@@ -3,12 +3,21 @@
 #include <thread>
 #include "sampa_head.h"
 #include "Elink.h"
+
+class receiver_handler
+{
+public:
+  virtual void  rec_handler(int addr,int ch,int nbsamp,int ts,int len, short *buff) = 0;
+};
+
+
 class receiver
 {
 public:
   receiver();
   receiver(elink *p);
   void set_userhandler(void (*foo)(int,int,int,int,int,short *));
+  void set_userhandler(receiver_handler* handler);
   void start();
   void join();
   bool joinable();
@@ -19,7 +28,7 @@ public:
 #endif
 private:
   void (*user_handler)(int,int,int,int,int,short *);
-
+  receiver_handler     *rec_handl;
 
   void handle_packet(const uint64_t header,int len,uint16_t *buffer);
   uint64_t synchead;

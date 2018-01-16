@@ -17,6 +17,7 @@ dualsampa::dualsampa(uint16_t addr1,uint16_t addr2)
                          //(10 mhz sampling rate)
   internal_ref = 0;
   user_handler = 0;
+  handler_dsp  = 0;
   data_regenerated = false;
 }
 
@@ -34,6 +35,11 @@ void dualsampa::set_user_handler(void (*uh)(int))
 {
   user_handler = uh;
 }
+void dualsampa::set_user_handler(dualsampa_handler *handler)
+{
+  handler_dsp = handler;
+}
+
 void dualsampa::select_channel(const uint8_t sId,const uint8_t chid)
 {
    if ((sId == 0) || (sId == 1))
@@ -103,6 +109,15 @@ bool dualsampa::serial_available()
       {
         data_regenerated = false;
         user_handler(internal_ref);
+        return data_regenerated;
+      }	
+    }
+    if (handler_dsp) 
+    {  
+     // if ((data_regenerated))
+      {
+        data_regenerated = false;
+        handler_dsp->dsp_handler(internal_ref);
         return data_regenerated;
       }	
     }
