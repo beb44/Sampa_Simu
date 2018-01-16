@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c++0x -Wall -g -pthread
+CFLAGS = -std=c++0x -Wall -g -pthread 
 EXEC_NAME = ../bin/Sampa_simu.out 
 LIB_NAME = ../lib/Sampa_simu.a 
 INCLUDES =
