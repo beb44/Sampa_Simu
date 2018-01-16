@@ -10,33 +10,33 @@ sampa_head::sampa_head(uint64_t head)
 {  
   intern_rawhead = head;
 }
-void sampa_head::decode()
+void sampa_head::decode() 
 {
   decode(intern_rawhead);
 }
 void sampa_head::decode(uint64_t head)
 {
-  fHammingCode             = (head>>44) & 0x3f; 
-  fHeaderParity            = (head>>43) & 0x01; 
-  fPkgType                 = (head>>40) & 0x07; 
-  fNbOf10BitWords          = (head>>30) & 0x3ff; 
-  fChipAddress             = (head>>26) & 0x0f; 
-  fChannelAddress          = (head>>21) & 0x1f; 
-  fBunchCrossingCounter    = (head>>1) & 0xfffff;
-  fPayloadParity           = head & 1;
+  fHammingCode             = ((head & HAMMINGCODE_MASK ) >>HAMMINGCODE_OFFSET); 
+  fHeaderParity            = ((head & HEADERPARITY_MASK)>>HEADERPARITY_OFFSET); 
+  fPkgType                 = ((head & PKGTYPE_MASK     )>>PKGTYPE_OFFSET     ); 
+  fNbOf10BitWords          = ((head & NBWORD_MASK      )>>NBWORD_OFFSET      ); 
+  fChipAddress             = ((head & CHAPPADDR_MASK   )>>CHAPPADDR_OFFSET   ); 
+  fChannelAddress          = ((head & CHANNEL_MASK     )>>CHANNEL_OFFSET     ); 
+  fBunchCrossingCounter    = ((head & BUNCHCROSS_OFFSET)>>BUNCHCROSS_OFFSET  );
+  fPayloadParity           = ((head & PARITY_MASK      )>> PARITY_OFFSET     );
 }
 uint64_t sampa_head::build()
 {
 uint64_t res = 0;
  
-   res = fHammingCode;
-   res = (res <<1) + fHeaderParity;
-   res = (res <<3) + fPkgType;
-   res = (res <<10) + fNbOf10BitWords;
-   res = (res <<4)+ fChipAddress;
-   res = (res <<5) + fChannelAddress;
-   res = (res <<20) + fBunchCrossingCounter;
-   res = (res <<1) + fPayloadParity;
+   res = (fHammingCode          << HAMMINGCODE_OFFSET )+
+         (fHeaderParity         << HEADERPARITY_OFFSET)+
+         (fPkgType              << PKGTYPE_OFFSET     )+
+         (fNbOf10BitWords       << NBWORD_OFFSET      )+
+         (fChipAddress          << CHAPPADDR_OFFSET   )+
+         (fChannelAddress       << CHANNEL_OFFSET     )+
+         (fBunchCrossingCounter << BUNCHCROSS_OFFSET  )+
+         (fPayloadParity        << PARITY_OFFSET      );
    return res;
   
 }
@@ -54,6 +54,16 @@ uint64_t sampa_head::build_sync()
    fPayloadParity        = 0; 
    return build();
  }
+
+uint8_t sampa_head::get_packet_type(uint64_t head)
+{
+  return ((head & PKGTYPE_MASK) >> PKGTYPE_OFFSET);
+}
+
+uint16_t sampa_head::get_nbwords(uint64_t head)
+{
+  return ((head & NBWORD_MASK) >> NBWORD_OFFSET);
+}
 
 void sampa_head::display()
 {

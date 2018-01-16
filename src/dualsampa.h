@@ -9,7 +9,7 @@
  *  This class provides a emulation artefacts for dualsampa chip serialisation mechanism.\n
  *  
  */
-class dualsampa final : public elink
+class dualsampa  : public elink
 {
 public:
   dualsampa(uint16_t addr1,uint16_t addr2);

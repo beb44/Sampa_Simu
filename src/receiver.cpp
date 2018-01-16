@@ -39,6 +39,10 @@ void receiver::join()
 {
   TheThread->join();
 }
+bool receiver::joinable()
+{
+  return TheThread->joinable();
+}
 void receiver::set_userhandler(void (*foo)(int,int,int,int,int,short *))
 {
   user_handler=foo;
@@ -68,12 +72,12 @@ void receiver::process()
     {
       if (headcd !=0)
       {
-        curhead = ((curhead <<1) + peer->get_serial()) & 0x3ffffffffffff;
+        curhead = ((curhead >>1) + (((uint64_t)(peer->get_serial()))<<49)) & 0x3ffffffffffff;
         headcd --;
 	if (headcd ==0)
 	{ 
 	  // header fully loaded, get playload length
-	  payload_length = (curhead >> 30) & 0xff; 
+	  payload_length = sampa_head().get_nbwords(curhead); 
 #ifdef STATS
           packetcount_by_type[sampa_head().get_packet_type(curhead)]++;
 	  packetcount++;
@@ -89,7 +93,7 @@ void receiver::process()
 	    // non empty packet, process
 	    _wpointer = &_frame[0];
             *_wpointer = 0;
-	    cur_len = 0; cur_bit = 9; 
+	    cur_len = 0; cur_bit = 0; 
 	  }
 	}
       }
@@ -97,17 +101,18 @@ void receiver::process()
       {
         //cout << "normal data reception "<< endl;	
         // data reception
-	*_wpointer =  ((*_wpointer) << 1)+peer->get_serial();
+	*_wpointer =  ((*_wpointer) )+((uint64_t)(peer->get_serial())<<cur_bit);
+	//cout << "partial word received " << std::bitset<10> (*_wpointer)  << endl;
 	//peer->get_serial();
-	cur_bit--;	
+	cur_bit++;	
 #if 1
-        if (cur_bit<0)
+        if (cur_bit==10)
         {
-	   //cout << "complete word received " << endl;
+	   //cout << "complete word received " << std::bitset<10> (*_wpointer)  << endl;
            // all bits in current word have been sent out
             _wpointer++;
             *_wpointer = 0;
-           cur_bit = 9;
+           cur_bit = 0;
 	   cur_len++;
 	   if (cur_len == payload_length) 
 	   {
@@ -124,13 +129,13 @@ void receiver::process()
     else
     {
       syncpos++;
-      curhead = ((curhead <<1) + peer->get_serial()) & 0x3ffffffffffff;
- //     cout << syncpos << " "<< std::bitset<50>( curhead )<< " " <<
- //     std::bitset<50> (synchead) << endl;
+      curhead = ((curhead >>1) + (((uint64_t)(peer->get_serial()))<<49)) & 0x3ffffffffffff;
+      //cout << syncpos << " "<< std::bitset<50>( curhead )<< " " <<
+      //std::bitset<50> (synchead) << endl;
       if (curhead == synchead)
       {
-         cout << syncpos << " "<< std::bitset<50>( curhead )<< "-"   << std::hex <<
-	 curhead << "payload length " << payload_length << endl;
+        // cout << syncpos << " "<< std::bitset<50>( curhead )<< "-"   << std::hex <<
+	//curhead << "payload length " << payload_length << endl;
         issync= true;
 	// cout <<"receiver: Synchronisation trouvee au bit" << (syncpos-50) << endl;   
 	headcd = 50; // 50 bit of header to be read

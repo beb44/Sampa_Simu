@@ -65,11 +65,11 @@ uint64_t   res;
 
 
    res= header.build_sync();
-   _frame[0]= (res >> 40 ) & 0x3ff;
-   _frame[1]= (res >> 30 ) & 0x3ff;
+   _frame[0]= (res >> 0  ) & 0x3ff;
+   _frame[1]= (res >> 10 ) & 0x3ff;
    _frame[2]= (res >> 20 ) & 0x3ff;
-   _frame[3]= (res >> 10 ) & 0x3ff;
-   _frame[4]= (res >> 0  ) & 0x3ff;
+   _frame[3]= (res >> 30 ) & 0x3ff;
+   _frame[4]= (res >> 40 ) & 0x3ff;
    _hasheader =  true;
 }
 
@@ -80,18 +80,18 @@ uint64_t   res;
 
    header.fHammingCode          = 0x3f;
    header.fHeaderParity         = 0;
-   header.fPkgType              = 0;
+   header.fPkgType              = 4;
    header.fNbOf10BitWords       = _wpointer-5; 
    header.fChipAddress          = Haddr; 
    header.fChannelAddress       = Channel ,
    header.fBunchCrossingCounter = 0xBAE2;
    header.fPayloadParity        = 0; 
    res= header.build();
-   _frame[0]= (res >> 40 ) & 0x3ff;
-   _frame[1]= (res >> 30 ) & 0x3ff;
+   _frame[0]= (res >> 0 ) & 0x3ff;
+   _frame[1]= (res >> 10 ) & 0x3ff;
    _frame[2]= (res >> 20 ) & 0x3ff;
-   _frame[3]= (res >> 10 ) & 0x3ff;
-   _frame[4]= (res >> 0  ) & 0x3ff;
+   _frame[3]= (res >> 30 ) & 0x3ff;
+   _frame[4]= (res >> 40  ) & 0x3ff;
    _hasheader =  true;
 }
 
@@ -175,18 +175,18 @@ uint8_t  res;
     cur_send_frame = send_list.front();
     send_list.pop_front();
     cur_word = 0;
-    cur_bit  = 9;
+    cur_bit  = 0;
     cur_len  = cur_send_frame[1]+5; // get size from the header
   }
   // get the data
   res =  ((cur_send_frame[cur_word] >> cur_bit) & 1);
   // increment pointer
-  cur_bit--;
-  if (cur_bit<0)
+  cur_bit++;
+  if (cur_bit==10)
   {
     // all bits in current word have been sent out
     cur_word ++;
-    cur_bit = 9;
+    cur_bit = 0;
     if (cur_word == cur_len)
     {
       // all words have been sent out

@@ -11,6 +11,7 @@ public:
   void set_userhandler(void (*foo)(int,int,int,int,int,short *));
   void start();
   void join();
+  bool joinable();
   void process();
 #ifdef STATS
   void display_stats();
