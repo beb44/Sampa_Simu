@@ -1,8 +1,8 @@
 CC = gcc
-CFLAGS = -std=c++0x -Wall -g -pthread
+CFLAGS = -std=c++0x -Wall -g -pthread -O3
 EXEC_NAME = main.out 
 INCLUDES =
-LIBS = -lstdc++ -lpthread -pthread
+LIBS = -lstdc++ -lpthread
 SRC_FILES = $(wildcard *.cpp)
 OBJ_FILES = $(SRC_FILES:%.cpp=%.o) 
 INSTALL_DIR = /usr/bin
