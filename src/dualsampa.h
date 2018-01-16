@@ -9,13 +9,19 @@
  *  This class provides a emulation artefacts for dualsampa chip serialisation mechanism.\n
  *  
  */
-class dualsampa final : public elink
+class dualsampa_handler
+{
+public:
+  virtual void dsp_handler(int ref) = 0;
+};
+class dualsampa  : public elink
 {
 public:
   dualsampa(uint16_t addr1,uint16_t addr2);
   ~dualsampa();
   void set_internal_ref(int ref);
   void set_user_handler(void (*uh)(int));
+  void set_user_handler(dualsampa_handler *handler);
   void select_channel(const uint8_t sId,const uint8_t chid);
   void reset_frames();
   void reset_frame(const uint8_t sId);
@@ -37,8 +43,9 @@ private:
    int        sync_countdown;
    int        send_credit;
    
-   int	      internal_ref;
-   void       (*user_handler)(int);
-   bool       data_regenerated;
+   int	              internal_ref;
+   void              (*user_handler)(int);
+   dualsampa_handler *handler_dsp;
+   bool              data_regenerated;
 };
 #endif

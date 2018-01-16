@@ -9,7 +9,7 @@
  *  This class provides a emulation artefacts for sampa chip serialisation mechanism.\n
  *  it prodives methods to build dsp generated build frames and methods to emulate serial link.
  */
-class sampa final : public elink
+class sampa  : public elink
 {
 public:
   sampa(uint16_t addr);

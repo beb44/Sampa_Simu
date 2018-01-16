@@ -11,11 +11,13 @@ dualsampa::dualsampa(uint16_t addr1,uint16_t addr2)
   sampas[1] = new sampa(addr2);  
   
   syncpacket     = sampa_head().build_sync();
+  //cout << "       " << std::hex << syncpacket << endl;
   sync_countdown = 50; // no sync packet to be sent (for the moment)
   send_credit    = 0; // 8192 bit to be sent per window 
                          //(10 mhz sampling rate)
   internal_ref = 0;
   user_handler = 0;
+  handler_dsp  = 0;
   data_regenerated = false;
 }
 
@@ -33,6 +35,11 @@ void dualsampa::set_user_handler(void (*uh)(int))
 {
   user_handler = uh;
 }
+void dualsampa::set_user_handler(dualsampa_handler *handler)
+{
+  handler_dsp = handler;
+}
+
 void dualsampa::select_channel(const uint8_t sId,const uint8_t chid)
 {
    if ((sId == 0) || (sId == 1))
@@ -105,6 +112,15 @@ bool dualsampa::serial_available()
         return data_regenerated;
       }	
     }
+    if (handler_dsp) 
+    {  
+     // if ((data_regenerated))
+      {
+        data_regenerated = false;
+        handler_dsp->dsp_handler(internal_ref);
+        return data_regenerated;
+      }	
+    }
     //return false;
   }
  //if (send_credit == 0) return false;
@@ -121,7 +137,7 @@ uint8_t dualsampa::get_serial()
   if (sync_countdown)
   {
     sync_countdown--;
-    return (syncpacket>>sync_countdown) & 1;
+    return (syncpacket>>(49-sync_countdown)) & 1;
   }
   // check normal data packets
   if (sampas[0]->serial_available()) return sampas[0]->get_serial();
@@ -129,5 +145,5 @@ uint8_t dualsampa::get_serial()
   // no dta packet available, send out sync packet
   sync_countdown = 49; // after send first sync bit, there will remain
                       // 49 bits
-  return (syncpacket>>sync_countdown) & 1;
+  return (syncpacket>>0) & 1;
 }
