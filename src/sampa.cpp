@@ -13,7 +13,7 @@ using namespace std;
  */
 sampa::sampa(uint16_t addr)
 {
-  cout <<"Sampa " << (int)addr << " created " << endl;
+  //cout <<"Sampa " << (int)addr << " created " << endl;
   Haddr = addr;
   reset_frame();  // make room for header
   Channel = 0;    // channel 0 is default
