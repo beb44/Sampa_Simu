@@ -4,6 +4,7 @@
 #include <bitset>
 #include <list>
 #include "GBTlink.h"
+#include "Elink.h"
 
 class GBT_s: public gbtlink
 {
