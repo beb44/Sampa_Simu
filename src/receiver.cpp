@@ -13,6 +13,9 @@ receiver::receiver()
   synchead = sampa_head().build_sync();
   curhead = 0;
   user_handler = 0;
+#ifdef STATS
+  reset_stats();
+#endif
 }
 
 receiver::receiver(elink *p)
@@ -22,6 +25,9 @@ receiver::receiver(elink *p)
   synchead = sampa_head().build_sync();
   syncpos = 0;
   curhead = 0;
+#ifdef STATS
+  reset_stats();
+#endif
 }
 
 void receiver::start()
@@ -68,6 +74,10 @@ void receiver::process()
 	{ 
 	  // header fully loaded, get playload length
 	  payload_length = (curhead >> 30) & 0xff; 
+#ifdef STATS
+          packetcount_by_type[sampa_head().get_packet_type(curhead)]++;
+	  packetcount++;
+#endif	
           //cout << syncpos << " "<< std::bitset<50>( curhead ) << "payload length " << payload_length << endl;
 	  if (payload_length == 0)
 	  {
@@ -119,11 +129,35 @@ void receiver::process()
  //     std::bitset<50> (synchead) << endl;
       if (curhead == synchead)
       {
-        // cout << syncpos << " "<< std::bitset<50>( curhead ) << "payload length " << payload_length << endl;
+         cout << syncpos << " "<< std::bitset<50>( curhead )<< "-"   << std::hex <<
+	 curhead << "payload length " << payload_length << endl;
         issync= true;
 	// cout <<"receiver: Synchronisation trouvee au bit" << (syncpos-50) << endl;   
 	headcd = 50; // 50 bit of header to be read
+#ifdef STATS
+        packetcount_by_type[sampa_head().get_packet_type(curhead)]++;
+	packetcount++;
+#endif	
       }	
     }
   }  
 }
+
+#ifdef STATS
+// statistic handling
+
+void receiver::reset_stats()
+{
+  packetcount = 0;
+  for (int i=0;i<8;i++) packetcount_by_type[i]=0;
+}
+void receiver::display_stats()
+{
+  cout << "Received packets statistics" << endl;
+  cout << "Total received packets : " << packetcount<< endl;
+  for (int i=0;i<8;i++)
+  {
+    cout <<  "Received packets type "<<i<< " : " << packetcount_by_type[i]<< endl; packetcount_by_type[i]=0;
+  }
+}
+#endif

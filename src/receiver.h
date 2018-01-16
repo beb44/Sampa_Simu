@@ -12,6 +12,10 @@ public:
   void start();
   void join();
   void process();
+#ifdef STATS
+  void display_stats();
+  void reset_stats();
+#endif
 private:
   void (*user_handler)(int,int,int,int,int,short *);
 
@@ -32,5 +36,10 @@ private:
   
   std::thread  *TheThread;
   
+  // statistic records
+#ifdef STATS
+  uint32_t  packetcount;
+  uint32_t  packetcount_by_type[8];
+#endif  
 };
 #endif
