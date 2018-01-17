@@ -2,6 +2,10 @@
 #define GBTR
 #include <bitset>
 #include <map>
+#include <mutex>
+#include <condition_variable>
+#include <sys/types.h>
+#include <semaphore.h>
 #include "Elink.h"
 #include "GBTlink.h"
 class GBT_gen
@@ -16,10 +20,10 @@ public:
   GBT_elink(int port,GBT_gen *gbt);
   bool serial_available(); 
   uint8_t get_serial(); 
+  int   _sample;
 private:
   GBT_gen *_gbt;
   int   _port;
-  int   _sample;
 };
 
 class GBT_r: public GBT_gen
@@ -37,6 +41,12 @@ private:
   int                          cur_sample;
   int                          nb_sample_readers;
   int                          nb_links;
-  std::bitset<128>  		curword;
+  std::bitset<128>  	       curword;
+  bool                         data_available;
+  std::mutex		       _mutex;
+  sem_t		               _wait_sem;
+  uint64_t                     _portmask;
+  uint64_t                     cur_portmask;
+ 
 };
 #endif

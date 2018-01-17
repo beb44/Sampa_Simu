@@ -36,11 +36,26 @@ receiver::receiver(elink *p)
 receiver::receiver(int port,GBT_r *p)
 {
   peer = p->get_elink(port);
+  synchead = sampa_head().build_sync();
+  syncpos = 0;
+  curhead = 0;
+  user_handler = 0;
+  rec_handl = 0;
+#ifdef STATS
+  reset_stats();
+#endif
 }
 
 void receiver::start()
 {
+  try {
   TheThread = new std::thread(&receiver::process,this);
+  }
+  catch (const std::exception& e)
+  {
+    cout << "execption catched" << endl;
+    throw;
+  }
 }
 
 void receiver::join()
@@ -101,7 +116,7 @@ void receiver::process()
           packetcount_by_type[sampa_head().get_packet_type(curhead)]++;
 	  packetcount++;
 #endif	
-          //cout << syncpos << " "<< std::bitset<50>( curhead ) << "payload length " << payload_length << endl;
+          cout << syncpos << " "<< std::bitset<50>( curhead ) << "payload length " << payload_length << endl;
 	  if (payload_length == 0)
 	  {
 	    // zero length packet, catch next header
@@ -136,9 +151,9 @@ void receiver::process()
 	   if (cur_len == payload_length) 
 	   {
 	     headcd = 50; // 50 bit of header to be read
-	     //cout << "complete data packet received" << endl;
-             //for (int i=0;i<cur_len;i++) cout << _frame[i] << " " ; 
-             //cout << endl;
+	     cout << "complete data packet received " << cur_len << endl;
+             for (int i=0;i<cur_len;i++) cout << _frame[i] << " " ; 
+             cout << endl;
 	     handle_packet(curhead,payload_length,_frame);
 	   }
          }

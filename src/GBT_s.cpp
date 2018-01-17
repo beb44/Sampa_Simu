@@ -33,8 +33,8 @@ uint8_t bit2;
 	bit1 = elinkmap[i]->get_serial();
 	if (!(elinkmap[i]->serial_available())) continue;
 	bit2 = elinkmap[i]->get_serial();
-	cur_word[i*2]   = bit1 & 1;
-	cur_word[i*2+1] = bit2 & 2;
+	cur_word[i*2]   = bit2 & 1;
+	cur_word[i*2+1] = bit1 & 1;
 	active_responder++;
       }
       else
@@ -54,7 +54,31 @@ uint8_t bit2;
 
 bool GBT_s::gbtword_available()
 {
-  return (send_list.size() !=0);
+bool     active_responder = false;
+uint8_t bit1;
+uint8_t bit2;
+  for (int i=0;i<maxsocket;i++)
+  {
+    if (elinkmap[i] != 0)
+    {
+      // a sampa is pluged on this socket
+      // read two bits if available
+      if (!(elinkmap[i]->serial_available())) continue;
+      bit1 = elinkmap[i]->get_serial();
+      if (!(elinkmap[i]->serial_available())) continue;
+      bit2 = elinkmap[i]->get_serial();
+      cur_word[i*2]   = bit2 & 1;
+      cur_word[i*2+1] = bit1 & 1;
+      active_responder= true;
+    }
+    else
+    {
+      cur_word[i*2]   = 0;
+      cur_word[i*2+1] = 0;
+    }
+  }
+  if (active_responder) send_list.push_back(cur_word);
+  return (active_responder !=0);
 }
 
 std::bitset<128> GBT_s::get_word()
