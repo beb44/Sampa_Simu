@@ -1,12 +1,9 @@
 CC = gcc
-<<<<<<< HEAD
 CFLAGS = -std=c++0x -Wall -g -pthread -O3
 EXEC_NAME = main.out 
-=======
 CFLAGS = -std=c++0x -Wall -g -pthread 
 EXEC_NAME = ../bin/Sampa_simu.out 
 LIB_NAME = ../lib/Sampa_simu.a 
->>>>>>> a17a0177dc8786517c54a6066c756a6f30723fa6
 INCLUDES =
 LIBS = -lstdc++ -lpthread
 SRC_FILES = $(wildcard *.cpp)
