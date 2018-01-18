@@ -2,7 +2,7 @@
 #define DUALSAMPA
 #include <cstdint>
 #include "sampa.h"
-#include "Elink.h"
+#include "elink.h"
 /*!
  *  \brief dualsampa chip emulator
  *
