@@ -11,22 +11,22 @@ using namespace std;
  *
  *  \param addr : hardware address of the sampa chip
  */
-sampa::sampa(uint16_t addr) : m_haddr(addr)
+Sampa::Sampa(uint16_t addr) : mHaddr(addr)
 {
-  reset_frame();  // make room for header
-  m_channel = 0;    // channel 0 is default
-  m_data_available = false;        // no serial data available;
-  m_cur_send_frame = (uint16_t *)0; // no current frame being sent
+  ResetFrame();  // make room for header
+  mChannel = 0;    // channel 0 is default
+  mDataAvailable = false;        // no serial data available;
+  mCurSendFrame = (uint16_t *)0; // no current frame being sent
 }
 
-sampa::~sampa()
+Sampa::~Sampa()
 {
-  cout <<"Sampa " << (int)m_haddr << " deleted " << endl; 
+  cout <<"Sampa " << (int)mHaddr << " deleted " << endl; 
 }
 
-void sampa::select_channel(const uint8_t chid)
+void Sampa::SelectChannel(const uint8_t chid)
 {
-  m_channel = chid;
+  mChannel = chid;
 }
 
 /*!
@@ -37,10 +37,10 @@ void sampa::select_channel(const uint8_t chid)
  *  If the previous frame has not been sent, it will be lost
  *  
  */
-void sampa::reset_frame()
+void Sampa::ResetFrame()
 {
-  m_wpointer = 5;  // make room for header
-  m_hasheader = false;
+  mWPointer = 5;  // make room for header
+  mHasHeader = false;
 }
 
 /*!
@@ -49,29 +49,29 @@ void sampa::reset_frame()
  *  \param len  length of the data chunk
  *  \param data adresse of the buffer 
  */
-void sampa::add_data(int const len, uint16_t const *data)
+void Sampa::AddData(int const len, uint16_t const *data)
 {
   // append data to the crrent frame
-  memcpy(m_frame+m_wpointer,data,sizeof(data)*len);
-  m_wpointer += len;
+  memcpy(mFrame+mWPointer,data,sizeof(data)*len);
+  mWPointer += len;
 }
 
-void sampa::make_sync()
+void Sampa::MakeSync()
 {
 sampa_head header;
 uint64_t   res;
 
 
    res= header.build_sync();
-   m_frame[0]= (res >> 0  ) & 0x3ff;
-   m_frame[1]= (res >> 10 ) & 0x3ff;
-   m_frame[2]= (res >> 20 ) & 0x3ff;
-   m_frame[3]= (res >> 30 ) & 0x3ff;
-   m_frame[4]= (res >> 40 ) & 0x3ff;
-   m_hasheader =  true;
+   mFrame[0]= (res >> 0  ) & 0x3ff;
+   mFrame[1]= (res >> 10 ) & 0x3ff;
+   mFrame[2]= (res >> 20 ) & 0x3ff;
+   mFrame[3]= (res >> 30 ) & 0x3ff;
+   mFrame[4]= (res >> 40 ) & 0x3ff;
+   mHasHeader =  true;
 }
 
-void sampa::make_data_header()
+void Sampa::MakeDataHeader()
 {
 sampa_head header;
 uint64_t   res;
@@ -79,18 +79,18 @@ uint64_t   res;
    header.fHammingCode          = 0x3f;
    header.fHeaderParity         = 0;
    header.fPkgType              = 4;
-   header.fNbOf10BitWords       = m_wpointer-5; 
-   header.fChipAddress          = m_haddr; 
-   header.fChannelAddress       = m_channel ,
+   header.fNbOf10BitWords       = mWPointer-5; 
+   header.fChipAddress          = mHaddr; 
+   header.fChannelAddress       = mChannel ,
    header.fBunchCrossingCounter = 0xBAE2;
    header.fPayloadParity        = 0; 
    res= header.build();
-   m_frame[0]= (res >> 0 ) & 0x3ff;
-   m_frame[1]= (res >> 10 ) & 0x3ff;
-   m_frame[2]= (res >> 20 ) & 0x3ff;
-   m_frame[3]= (res >> 30 ) & 0x3ff;
-   m_frame[4]= (res >> 40  ) & 0x3ff;
-   m_hasheader =  true;
+   mFrame[0]= (res >> 0 ) & 0x3ff;
+   mFrame[1]= (res >> 10 ) & 0x3ff;
+   mFrame[2]= (res >> 20 ) & 0x3ff;
+   mFrame[3]= (res >> 30 ) & 0x3ff;
+   mFrame[4]= (res >> 40  ) & 0x3ff;
+   mHasHeader =  true;
 }
 
 
@@ -104,25 +104,25 @@ uint64_t   res;
  *  The frame will not been 'reset' and can ben reused.
  *  
  */
-void sampa::send_frame()
+void Sampa::SendFrame()
 {
 
 uint16_t  *_fp;
 
   // if no data and no header build, just ignore
-  if ((m_wpointer == 5) && (m_hasheader == false))
+  if ((mWPointer == 5) && (mHasHeader == false))
     return;
     
   // if the buffer is not yet built, make it
-  if (m_hasheader == false)
-    make_data_header();
+  if (mHasHeader == false)
+    MakeDataHeader();
     
   // 
   // clone the current buffer and link it to the sending list
   //
-  _fp= (uint16_t  *) malloc(sizeof(uint16_t)*m_wpointer);
-  memcpy(_fp,m_frame,sizeof(uint16_t)*m_wpointer); 
-  send_list.push_back(_fp);
+  _fp= (uint16_t  *) malloc(sizeof(uint16_t)*mWPointer);
+  memcpy(_fp,mFrame,sizeof(uint16_t)*mWPointer); 
+  mSendList.push_back(_fp);
 } 
 
 /*!
@@ -130,22 +130,22 @@ uint16_t  *_fp;
  *
  * Debugging tool for displaying the internal buffer contents. It automatically generates the header if needed.
  */
-void sampa::disp_frame()
+void Sampa::DispFrame()
 {
 
-uint16_t  *_fp = m_frame;
+uint16_t  *_fp = mFrame;
 
   // if no data and no header build, just ignore
-  if ((m_wpointer == 5) && (m_hasheader == false))
+  if ((mWPointer == 5) && (mHasHeader == false))
     return;
-  if (m_hasheader == false)
-    make_data_header();
+  if (mHasHeader == false)
+    MakeDataHeader();
   cout << "Header "<< endl;
   for (int i=0;i<5;i++)
     cout << std::bitset<10> (*(_fp++) )<< endl;
-  if (m_wpointer != 5) {
+  if (mWPointer != 5) {
     cout << "Payload " << endl;
-    for (int i=5;i<m_wpointer;i++)
+    for (int i=5;i<mWPointer;i++)
       cout << std::bitset<10> (*(_fp++) ) << endl;   
   }
 }
@@ -155,45 +155,45 @@ uint16_t  *_fp = m_frame;
  * \return True is fome data is available, false otherwise
  *
  */
-bool sampa::serial_available()
+bool Sampa::SerialAvailable()
 {
-  if (send_list.size() != 0)
-    m_data_available = true;
-  return m_data_available;
+  if (mSendList.size() != 0)
+    mDataAvailable = true;
+  return mDataAvailable;
 }
 
-uint8_t sampa::get_serial()
+uint8_t Sampa::GetSerial()
 {
 uint8_t  res;
 
-  if (m_cur_send_frame == (uint16_t *)0) {
+  if (mCurSendFrame == (uint16_t *)0) {
     // no frame being sent for now, check for waiting ones
-    if (send_list.size() == 0) 
+    if (mSendList.size() == 0) 
       return 0xff; 
     // set internal variable
-    m_cur_send_frame = send_list.front();
-    send_list.pop_front();
-    m_cur_word = 0;
-    m_cur_bit  = 0;
-    m_cur_len  = m_cur_send_frame[1]+5; // get size from the header
+    mCurSendFrame = mSendList.front();
+    mSendList.pop_front();
+    mCurWord = 0;
+    mCurBit  = 0;
+    mCurLen  = mCurSendFrame[1]+5; // get size from the header
   }
   // get the data
-  res =  ((m_cur_send_frame[m_cur_word] >> m_cur_bit) & 1);
+  res =  ((mCurSendFrame[mCurWord] >> mCurBit) & 1);
   // increment pointer
-  m_cur_bit++;
-  if (m_cur_bit==10) {
+  mCurBit++;
+  if (mCurBit==10) {
     // all bits in current word have been sent out
-    m_cur_word ++;
-    m_cur_bit = 0;
-    if (m_cur_word == m_cur_len) {
+    mCurWord ++;
+    mCurBit = 0;
+    if (mCurWord == mCurLen) {
       // all words have been sent out
-      m_data_available = false;
+      mDataAvailable = false;
       // free memory 
-      m_cur_word = 0;
-      m_cur_len  = 0;
-      m_cur_bit  = 0; 
-      free(m_cur_send_frame);
-      m_cur_send_frame = (uint16_t *)0;
+      mCurWord = 0;
+      mCurLen  = 0;
+      mCurBit  = 0; 
+      free(mCurSendFrame);
+      mCurSendFrame = (uint16_t *)0;
     } 
   }
   return res;

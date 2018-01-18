@@ -5,49 +5,49 @@
 
 using namespace std;
 #if 0 
-receiver::receiver()
+Receiver::Receiver()
 {  
-  m_peer = (elink *)0;
-  m_is_synced = false;
-  m_syncpos = 0;
-  m_synchead = sampa_head().build_sync();
-  m_curhead = 0;
+  mPeer = (elink *)0;
+  mIsSynced = false;
+  mSyncPos = 0;
+  mSyncHead = sampa_head().build_sync();
+  mCurHead = 0;
   user_handler = 0;
-  rec_handl = 0;
+  mRecHandl = 0;
 #ifdef STATS
   reset_stats();
 #endif
 }
 #endif
-receiver::receiver(elink &p) : m_peer(p)
+Receiver::Receiver(Elink &p) : mPeer(p)
 {  
-  m_is_synced = false;
-  m_synchead = sampa_head().build_sync();
-  m_syncpos = 0;
-  m_curhead = 0;
+  mIsSynced = false;
+  mSynchead = sampa_head().build_sync();
+  mSyncPos = 0;
+  mCurHead = 0;
   user_handler = 0;
-  rec_handl = 0;
+  mRecHandl = 0;
 #ifdef STATS
   reset_stats();
 #endif
 }
 
-receiver::receiver(int port,gbt_r &p): m_peer(p.get_elink(port)), m_port(port) 
+Receiver::Receiver(int port,gbt_r &p): mPeer(p.get_elink(port)), mPort(port) 
 {
-  m_synchead = sampa_head().build_sync();
-  m_syncpos = 0;
-  m_curhead = 0;
+  mSynchead = sampa_head().build_sync();
+  mSyncPos = 0;
+  mCurHead = 0;
   user_handler = 0;
-  rec_handl = 0;
+  mRecHandl = 0;
 #ifdef STATS
   reset_stats();
 #endif
 }
 
-void receiver::start()
+void Receiver::Start()
 {
   try {
-  TheThread = new std::thread(&receiver::process,this);
+  TheThread = new std::thread(&Receiver::Process,this);
   }
   catch (const std::exception& e) {
     cout << "execption catched" << endl;
@@ -55,29 +55,29 @@ void receiver::start()
   }
 }
 
-void receiver::join()
+void Receiver::Join()
 {
   TheThread->join();
 }
-bool receiver::joinable()
+bool Receiver::Joinable()
 {
   return TheThread->joinable();
 }
-void receiver::set_userhandler(void (*foo)(int,int,int,int,int,short *))
+void Receiver::SetUserHandler(void (*foo)(int,int,int,int,int,short *))
 {
   user_handler=foo;
 }
 
-void receiver::set_userhandler(receiver_handler *handler)
+void Receiver::SetUserHandler(ReceiverHandler *handler)
 {
-  rec_handl=handler;
+  mRecHandl=handler;
 }
 
-void receiver::handle_packet(const uint64_t header,int len,uint16_t *buffer)
+void Receiver::HandlePacket(const uint64_t header,int len,uint16_t *buffer)
 {
 sampa_head  head_decoder(header);
 
-  head_decoder.decode();
+  head_decoder.decode(); 
   //head_decoder.display();
   if (user_handler) user_handler(head_decoder.fChipAddress,
   			         head_decoder.fChannelAddress,
@@ -86,7 +86,7 @@ sampa_head  head_decoder(header);
 				 buffer[1],
 				 (short *)&buffer[2]);
 				 
-  if (rec_handl) rec_handl->rec_handler(head_decoder.fChipAddress,
+  if (mRecHandl) mRecHandl->RecHandler(head_decoder.fChipAddress,
   			         head_decoder.fChannelAddress,
 				 0,
 				 buffer[0],
@@ -94,59 +94,59 @@ sampa_head  head_decoder(header);
 				 (short *)&buffer[2]);
 				
 }
-void receiver::process()
+void Receiver::Process()
 {  
 int      payload_length;
 
-//  if (m_peer == (elink *)0) return;
-  while (m_peer.serial_available()) {
-    if (m_is_synced) {
-      if (m_headcd !=0) {
-        m_curhead = ((m_curhead >>1) + (((uint64_t)(m_peer.get_serial()))<<49)) & 0x3ffffffffffff;
-        m_headcd --;
-	if (m_headcd ==0) { 
+//  if (mPeer == (elink *)0) return;
+  while (mPeer.SerialAvailable()) {
+    if (mIsSynced) {
+      if (mHeadcd !=0) {
+        mCurHead = ((mCurHead >>1) + (((uint64_t)(mPeer.GetSerial()))<<49)) & 0x3ffffffffffff;
+        mHeadcd --;
+	if (mHeadcd ==0) { 
 	  // header fully loaded, get playload length
-	  payload_length = sampa_head().get_nbwords(m_curhead); 
+	  payload_length = sampa_head().get_nbwords(mCurHead); 
 #ifdef STATS
           packetcount_by_type[sampa_head().get_packet_type(m_curhead)]++;
 	  packetcount++;
 #endif	
 	  if (payload_length == 0) {
 	    // zero length packet, catch next header
-	    m_headcd = 50; // 50 bit of header to be read
+	    mHeadcd = 50; // 50 bit of header to be read
 	  }
 	  else {
 	    // non empty packet, process
-	    m_wpointer = &m_frame[0];
-            *m_wpointer = 0;
-	    m_cur_len = 0; m_cur_bit = 0; 
+	    mWPointer = &mFrame[0];
+            *mWPointer = 0;
+	    mCurLen = 0; mCurBit = 0; 
 	  }
 	}
       }
       else {
         // data reception
-	*m_wpointer =  ((*m_wpointer) )+((uint64_t)(m_peer.get_serial())<<m_cur_bit);
-	m_cur_bit++;	
-        if (m_cur_bit==10) {
+	*mWPointer =  ((*mWPointer) )+((uint64_t)(mPeer.GetSerial())<<mCurBit);
+	mCurBit++;	
+        if (mCurBit==10) {
           // all bits in current word have been sent out
-          m_wpointer++;
-          *m_wpointer = 0;
-          m_cur_bit = 0;
-	  m_cur_len++;
-	  if (m_cur_len == payload_length)  {
-	     m_headcd = 50; // 50 bit of header to be read
-	     handle_packet(m_curhead,payload_length,m_frame);
+          mWPointer++;
+          *mWPointer = 0;
+          mCurBit = 0;
+	  mCurLen++;
+	  if (mCurLen == payload_length)  {
+	     mHeadcd = 50; // 50 bit of header to be read
+	     HandlePacket(mCurHead,payload_length,mFrame);
 	   }
          }
        }  
     }
     else {
-      m_syncpos++;
-      m_curhead = ((m_curhead >>1) + (((uint64_t)(m_peer.get_serial()))<<49)) & 0x3ffffffffffff;
-      if (m_curhead == m_synchead) {
+      mSyncPos++;
+      mCurHead = ((mCurHead >>1) + (((uint64_t)(mPeer.GetSerial()))<<49)) & 0x3ffffffffffff;
+      if (mCurHead == mSynchead) {
 	//m_curhead << "payload length " << payload_length << endl;
-        m_is_synced= true;
-	m_headcd = 50; // 50 bit of header to be read
+        mIsSynced= true;
+	mHeadcd = 50; // 50 bit of header to be read
 #ifdef STATS
         packetcount_by_type[sampa_head().get_packet_type(m_curhead)]++;
 	packetcount++;
@@ -159,7 +159,7 @@ int      payload_length;
 #ifdef STATS
 // statistic handling
 
-void receiver::reset_stats()
+void Receiver::reset_stats()
 {
   packetcount = 0;
   for (int i=0;i<8;i++) packetcount_by_type[i]=0;

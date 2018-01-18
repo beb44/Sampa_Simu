@@ -2,57 +2,57 @@
 #define RECEIVER
 #include <thread>
 #include "sampa_head.h"
-#include "elink.h"
-#include "gbt_r.h"
+#include "Elink.h"
+#include "GbtR.h"
 
-class receiver_handler
+class ReceiverHandler
 {
 public:
-  virtual void  rec_handler(int addr,int ch,int nbsamp,int ts,int len, short *buff) = 0;
+  virtual void  RecHandler(int addr,int ch,int nbsamp,int ts,int len, short *buff) = 0;
 };
 
 
-class receiver
+class Receiver
 {
 public:
-  receiver();
-  receiver(elink &p);
-  receiver(int port,gbt_r &p);
-  void set_userhandler(void (*foo)(int,int,int,int,int,short *));
-  void set_userhandler(receiver_handler* handler);
-  void start();
-  void join();
-  bool joinable();
-  void process();
+  Receiver();
+  Receiver(Elink &p);
+  Receiver(int port,gbt_r &p);
+  void SetUserHandler(void (*foo)(int,int,int,int,int,short *));
+  void SetUserHandler(ReceiverHandler* handler);
+  void Start();
+  void Join();
+  bool Joinable();
+  void Process();
 #ifdef STATS
-  void display_stats();
-  void reset_stats();
+  void DisplayStats();
+  void ResetStats();
 #endif
 private:
   void (*user_handler)(int,int,int,int,int,short *);
-  receiver_handler     *rec_handl;
+  ReceiverHandler     *mRecHandl;
 
-  void handle_packet(const uint64_t header,int len,uint16_t *buffer);
+  void HandlePacket(const uint64_t header,int len,uint16_t *buffer);
   
-  uint64_t m_synchead;
-  uint64_t m_curhead;
+  uint64_t mSynchead;
+  uint64_t mCurHead;
  
-  elink     &m_peer;
-  bool      m_is_synced;
-  int       m_syncpos;  
-  int       m_headcd;
-  int       m_cur_bit;
-  uint16_t  m_cur_len;
-  uint16_t  *m_wpointer;
-  uint16_t  m_frame[1024];
+  Elink     &mPeer;
+  bool      mIsSynced;
+  int       mSyncPos;  
+  int       mHeadcd;
+  int       mCurBit;
+  uint16_t  mCurLen;
+  uint16_t  *mWPointer;
+  uint16_t  mFrame[1024];
   
   std::thread  *TheThread;
-  int       m_port;
+  int       mPort;
   
   // statistic records
 #ifdef STATS
-  uint32_t  m_packetcount;
-  uint32_t  m_packetcount_by_type[8];
+  uint32_t  mPacketCount;
+  uint32_t  mPacketCountByType[8];
 #endif  
 };
 #endif

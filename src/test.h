@@ -7,7 +7,7 @@
 #include <ctime>
 #include <map>
 
-class Test: public dualsampa_handler,receiver_handler
+class Test: public DualSampaHandler,ReceiverHandler
 {
 public:
   Test(int nbthread,int nbloop);
@@ -16,8 +16,8 @@ public:
   void rec_handler(int addr,int ch,int nbsamp,int ts,int len, short *buff);
   void display();
 //private:
-  std::map<int,dualsampa *>   dsarr;
-  std::map<int,receiver  *> recarr;
+  std::map<int,DualSampa *>   dsarr;
+  std::map<int,Receiver  *> recarr;
   std::map<int,int>         looparr;
   std::chrono::time_point<std::chrono::system_clock> cstart; 
   std::chrono::time_point<std::chrono::system_clock> laststarted;

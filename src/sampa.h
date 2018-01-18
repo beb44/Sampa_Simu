@@ -2,47 +2,47 @@
 #define SAMPA
 #include <cstdint>
 #include <list>
-#include "elink.h"
+#include "Elink.h"
 /*!
  *  \brief sampa chip emulator
  *
  *  This class provides a emulation artefacts for sampa chip serialisation mechanism.\n
  *  it prodives methods to build dsp generated build frames and methods to emulate serial link.
  */
-class sampa  : public elink
+class Sampa  : public Elink
 {
 public:
-  explicit sampa(uint16_t addr); 
-  ~sampa();
-  void select_channel(const uint8_t chid);
-  void reset_frame();
-  void add_data(int const len, uint16_t const *data);
+  explicit Sampa(uint16_t addr); 
+  ~Sampa();
+  void SelectChannel(const uint8_t chid);
+  void ResetFrame();
+  void AddData(int const len, uint16_t const *data);
  
-  void disp_frame();
-  void send_frame();
+  void DispFrame();
+  void SendFrame();
 
-  void make_sync();
+  void MakeSync();
  
-  bool    serial_available(); 
-  uint8_t get_serial();
+  bool    SerialAvailable(); 
+  uint8_t GetSerial();
   
 private:
 
-  void make_data_header();
+  void MakeDataHeader();
 
-  uint16_t  m_frame[1024+5];
-  uint16_t  m_wpointer;
-  bool      m_hasheader;
-  uint8_t   m_haddr;
-  uint8_t   m_channel;
+  uint16_t  mFrame[1024+5];
+  uint16_t  mWPointer;
+  bool      mHasHeader;
+  uint8_t   mHaddr;
+  uint8_t   mChannel;
   
-  std::list<uint16_t *>  send_list;
+  std::list<uint16_t *>  mSendList;
   
-  bool      m_data_available;
-  uint16_t  *m_cur_send_frame;
-  int       m_cur_word;
-  int       m_cur_bit;
-  uint16_t  m_cur_len;
+  bool      mDataAvailable;
+  uint16_t  *mCurSendFrame;
+  int       mCurWord;
+  int       mCurBit;
+  uint16_t  mCurLen;
   
 };
 #endif
