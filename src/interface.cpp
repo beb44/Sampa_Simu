@@ -89,7 +89,7 @@ extern "C" int send_frames(int id)
 extern "C" int set_user_handler(int id,void (*user_handler)(int))
 {
   try {
-    manitou::getInstance()->get_dualsampa(id)->set_user_handler(user_handler);
+    manitou::getInstance()->get_dualsampa(id)->set_data_provider(user_handler);
   }
   catch (const std::exception & e)
   {
