@@ -5,7 +5,7 @@
 #include "sampa.h"
 #include "dualsampa.h"
 #include "receiver.h"
-#include "GBT_s.h"
+#include "gbt_s.h"
 #include "gbt_r.h"
 #include "manitou.h"
 #include "interface.h"
@@ -16,13 +16,13 @@ using namespace std;
 
 sampa sampa_0(0);
 dualsampa ds(10,12);
-GBT_s    gbt_s1;
+gbt_s    gbt_s1;
 gbt_r    gbt_r1(gbt_s1);
 receiver rec(0,gbt_r1);
 dualsampa ds1(22,24);
 receiver rec1(1,gbt_r1);
 int dsid =0;
-int loop = 5;//00000;
+int loop = 500;//00000;
 
 void dsp_handler(int ref)
 {
