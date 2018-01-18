@@ -12,37 +12,37 @@
 class sampa  : public elink
 {
 public:
-  sampa(uint16_t addr);
+  explicit sampa(uint16_t addr); 
   ~sampa();
   void select_channel(const uint8_t chid);
   void reset_frame();
-  void add_data(int len, uint16_t *data);
+  void add_data(int const len, uint16_t const *data);
  
   void disp_frame();
   void send_frame();
 
   void make_sync();
  
-  bool serial_available(); 
+  bool    serial_available(); 
   uint8_t get_serial();
   
 private:
 
   void make_data_header();
 
-  uint16_t  _frame[1024+5];
-  uint16_t  _wpointer;
-  bool      _hasheader;
-  uint8_t   Haddr;
-  uint8_t   Channel;
+  uint16_t  m_frame[1024+5];
+  uint16_t  m_wpointer;
+  bool      m_hasheader;
+  uint8_t   m_haddr;
+  uint8_t   m_channel;
   
   std::list<uint16_t *>  send_list;
   
-  bool      _data_available;
-  uint16_t  *cur_send_frame;
-  int       cur_word;
-  int       cur_bit;
-  uint16_t  cur_len;
+  bool      m_data_available;
+  uint16_t  *m_cur_send_frame;
+  int       m_cur_word;
+  int       m_cur_bit;
+  uint16_t  m_cur_len;
   
 };
 #endif
