@@ -2,14 +2,12 @@
 #include <cstdint>
 #include <chrono>
 #include <ctime>
-#include "sampa.h"
-#include "dualsampa.h"
-#include "receiver.h"
+#include "Sampa.h"
+#include "DualSampa.h"
+#include "Receiver.h"
 #include "GbtS.h"
 #include "GbtR.h"
-#include "manitou.h"
 #include "interface.h"
-//#include "Test.h"
 using namespace std;
 
 #define  NBT 100

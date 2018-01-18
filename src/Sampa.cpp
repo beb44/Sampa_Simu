@@ -2,8 +2,8 @@
 #include <string.h>
 #include <cstdint>
 #include <bitset>
-#include "sampa_head.h"
-#include "sampa.h"
+#include "SampaHead.h"
+#include "Sampa.h"
 using namespace std; 
 
  /*!

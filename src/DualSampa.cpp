@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdint>
-#include "dualsampa.h" 
-#include "sampa_head.h"
+#include "DualSampa.h" 
+#include "SampaHead.h"
 using namespace std;
 
 /*!

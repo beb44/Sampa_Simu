@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <bitset>
 #include <list>
-#include "gbtlink.h"
+#include "GbtLink.h"
 #include "Elink.h"
 
 class GbtS: public gbtlink

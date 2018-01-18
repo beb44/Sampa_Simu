@@ -5,10 +5,10 @@
 #include <iostream>
 #include <cstdint>
 #include <stdexcept>
-#include "sampa.h"
-#include "dualsampa.h"
-#include "receiver.h"
-#include "manitou.h"
+#include "Sampa.h"
+#include "DualSampa.h"
+#include "Receiver.h"
+#include "Manitou.h"
 
 /*!
  *  \function create_dualsampa

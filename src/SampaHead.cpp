@@ -1,5 +1,5 @@
 #include <iostream>
-#include "sampa_head.h"
+#include "SampaHead.h"
 using namespace std;
 
 sampa_head::sampa_head()

@@ -1,7 +1,7 @@
 #ifndef RECEIVER
 #define RECEIVER
 #include <thread>
-#include "sampa_head.h"
+#include "SampaHead.h"
 #include "Elink.h"
 #include "GbtR.h"
 

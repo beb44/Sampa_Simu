@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <semaphore.h>
 #include "Elink.h"
-#include "gbtlink.h"
+#include "GbtLink.h"
 class GbtGen
 {
 public:

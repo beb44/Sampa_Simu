@@ -1,7 +1,7 @@
 #include <iostream>
 #include <bitset>
 #include <thread>
-#include "receiver.h" 
+#include "Receiver.h" 
 
 using namespace std;
 #if 0 

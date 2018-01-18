@@ -1,7 +1,7 @@
 #ifndef TEST
 #define TEST
-#include "dualsampa.h"
-#include "receiver.h"
+#include "DualSampa.h"
+#include "Receiver.h"
 #include <cstdint>
 #include <chrono>
 #include <ctime>

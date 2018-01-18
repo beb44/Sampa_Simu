@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdexcept>
-#include "manitou.h"
+#include "Manitou.h"
 
 using namespace std;
 

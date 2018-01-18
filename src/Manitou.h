@@ -2,7 +2,7 @@
 #define MANITOU
 #include <cstdint>
 #include <map>
-#include "dualsampa.h"
+#include "DualSampa.h"
 
 using namespace std;
 /*!
