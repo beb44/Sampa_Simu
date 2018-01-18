@@ -86,7 +86,7 @@ extern "C" int send_frames(int id)
 
 }
 
-extern "C" int set_user_handler(int id,void (*user_handler)(int))
+extern "C" int set_data_provider(int id,void (*user_handler)(int))
 {
   try {
     manitou::getInstance()->get_dualsampa(id)->set_data_provider(user_handler);
