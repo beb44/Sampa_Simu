@@ -6,7 +6,7 @@
 #include "dualsampa.h"
 #include "receiver.h"
 #include "GBT_s.h"
-#include "GBT_r.h"
+#include "gbt_r.h"
 #include "manitou.h"
 #include "interface.h"
 #include "Test.h"
@@ -17,16 +17,16 @@ using namespace std;
 sampa sampa_0(0);
 dualsampa ds(10,12);
 GBT_s    gbt_s1;
-GBT_r    gbt_r1(&gbt_s1);
-receiver rec(0,&gbt_r1);
+gbt_r    gbt_r1(gbt_s1);
+receiver rec(0,gbt_r1);
 dualsampa ds1(22,24);
-receiver rec1(1,&gbt_r1);
+receiver rec1(1,gbt_r1);
 int dsid =0;
-int loop = 4;//00000;
+int loop = 5;//00000;
 
 void dsp_handler(int ref)
 {
-uint16_t data[4] = {7,2,0x1,0x20}; 
+//uint16_t data[4] = {7,2,0x1,0x20}; 
   // stops when max number of loops reached
   if (loop-- == 0) return;
 #if 0
@@ -43,9 +43,10 @@ uint16_t data[4] = {7,2,0x1,0x20};
   return;  
   //cout << "DSP handler "<< std::dec <<ref  << endl; 
  }
+ #if 1
 void dsp_handler1(int ref)
 {
-uint16_t data[4] = {7,2,0x1,0x20}; 
+//uint16_t data[4] = {7,2,0x1,0x20}; 
   // stops when max number of loops reached
   if (loop-- == 0) return;
 #if 0
@@ -62,7 +63,7 @@ uint16_t data[4] = {7,2,0x1,0x20};
   return;  
   //cout << "DSP handler "<< std::dec <<ref  << endl; 
  }
-
+#endif
 void rec_handler(int addr,int ch,int nbsamp,int ts,int len, short *buff)
 {
   cout << "Packet recieved "<< std::dec <<addr << " " << buff[0] << endl; 
@@ -82,13 +83,15 @@ void rec_handler1(int addr,int ch,int nbsamp,int ts,int len, short *buff)
 int main()
 {
   try {
-  ds.set_user_handler(dsp_handler);
+  ds.set_data_provider(dsp_handler);
+  ds.set_internal_ref(0);
   rec.set_userhandler(rec_handler);
   gbt_s1.plug_elink(0,&ds);
   rec.start();
-  ds1.set_user_handler(dsp_handler1);
+  ds1.set_data_provider(dsp_handler1); 
+  ds1.set_internal_ref(10);
   rec1.set_userhandler(rec_handler1);
-  gbt_s1.plug_elink(1,&ds1);
+   gbt_s1.plug_elink(1,&ds1);
   rec1.start();
   rec.join();
   rec1.join();

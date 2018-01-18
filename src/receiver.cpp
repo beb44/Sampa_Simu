@@ -32,7 +32,7 @@ receiver::receiver(elink &p) : m_peer(p)
 #endif
 }
 
-receiver::receiver(int port,GBT_r &p): m_peer(p.get_elink(port)), m_port(port) 
+receiver::receiver(int port,gbt_r &p): m_peer(p.get_elink(port)), m_port(port) 
 {
   m_synchead = sampa_head().build_sync();
   m_syncpos = 0;

@@ -3,7 +3,7 @@
 #include <thread>
 #include "sampa_head.h"
 #include "elink.h"
-#include "GBT_r.h"
+#include "gbt_r.h"
 
 class receiver_handler
 {
@@ -17,7 +17,7 @@ class receiver
 public:
   receiver();
   receiver(elink &p);
-  receiver(int port,GBT_r &p);
+  receiver(int port,gbt_r &p);
   void set_userhandler(void (*foo)(int,int,int,int,int,short *));
   void set_userhandler(receiver_handler* handler);
   void start();
