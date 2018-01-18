@@ -1,11 +1,11 @@
 #ifndef ELINK
 #define ELINK
 #include <cstdint>
-class elink
+class Elink
 {
 public:
-  ~elink() {}
-  virtual bool serial_available()=0; 
-  virtual uint8_t get_serial()=0;
+  virtual ~Elink() {}
+  virtual bool SerialAvailable()=0; 
+  virtual uint8_t GetSerial()=0;
 };
 #endif
