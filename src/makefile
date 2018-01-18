@@ -1,5 +1,4 @@
-CC = gcc
-CFLAGS = -std=c++0x -Wall -g -pthread -O3
+CC = g++
 EXEC_NAME = main.out 
 CFLAGS = -std=c++0x -Wall -g -pthread 
 EXEC_NAME = ../bin/Sampa_simu.out 

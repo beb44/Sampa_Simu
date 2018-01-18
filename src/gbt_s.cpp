@@ -1,23 +1,23 @@
 #include <iostream>
-#include "gbt_s.h"
+#include "GbtS.h"
 using namespace std;
-gbt_s::gbt_s() 
+GbtS::GbtS() 
 {
 
-  m_send_list.clear();
+  mSendList.clear();
   // reset elink map
-  for (int i=0;i<maxsocket;i++) m_elinkmap[i] = 0;
-  m_nb_rec =0;
-}
- 
-void gbt_s::plug_elink(const uint8_t socket,elink *peer)
-{
-  if (!(socket<maxsocket)) return;
-  m_elinkmap[socket] = peer;
-  m_nb_rec +=1;
+  for (int i=0;i<mMaxSocket;i++) mElinkMap[i] = 0;
+  mNbRec =0;
 }
 
-void gbt_s::process()
+void GbtS::PlugElink(const uint8_t socket,Elink *peer)
+{
+  if (!(socket<mMaxSocket)) return;
+  mElinkMap[socket] = peer;
+  mNbRec +=1;
+}
+
+void GbtS::Process()
 {
 int     active_responder;
 uint8_t bit1;
@@ -26,73 +26,73 @@ uint8_t bit2;
   while (active_responder != 0) {
     // reset nb responder
     active_responder = 0;
-    for (int i=0;i<maxsocket;i++) {
-      if (m_elinkmap[i] != 0) {
-	if ((m_elinkmap[i]->serial_available()) == false) { 
+    for (int i=0;i<mMaxSocket;i++) {
+      if (mElinkMap[i] != 0) {
+	if ((mElinkMap[i]->SerialAvailable()) == false) { 
 	  continue;
 	}
-	bit1 = m_elinkmap[i]->get_serial();
-	if ((m_elinkmap[i]->serial_available()) == false) { 
+	bit1 = mElinkMap[i]->GetSerial();
+	if ((mElinkMap[i]->SerialAvailable()) == false) { 
 	  continue;
 	}
-	bit2 = m_elinkmap[i]->get_serial();
-	m_cur_word[i*2]   = bit1 & 1;
-	m_cur_word[i*2+1] = bit2 & 1;
+	bit2 = mElinkMap[i]->GetSerial();
+	mCurWord[i*2]   = bit1 & 1;
+	mCurWord[i*2+1] = bit2 & 1;
 	active_responder++;
       }
       else {
-	m_cur_word[i*2]   = 0;
-	m_cur_word[i*2+1] = 0;
+	mCurWord[i*2]   = 0;
+	mCurWord[i*2+1] = 0;
       }
     }
-    if (active_responder == m_nb_rec) {
+    if (active_responder == mNbRec) {
       //
       // all link have returned data, push word for sending
       //
-      m_send_list.push_back(m_cur_word);
+      mSendList.push_back(mCurWord);
     }
   } // end while (active....
 }
 
-bool gbt_s::gbtword_available()
+bool GbtS::GbtWordAvailable()
 {
 int     active_responder = 0;
 uint8_t bit1;
 uint8_t bit2;
 
-  for (int i=0;i<maxsocket;i++) {
-    if (m_elinkmap[i] != 0) {
+  for (int i=0;i<mMaxSocket;i++) {
+    if (mElinkMap[i] != 0) {
       //
       // a sampa is pluged on this socket
       // read two bits if available
-      if (!(m_elinkmap[i]->serial_available())) continue;
-      bit1 = m_elinkmap[i]->get_serial();
-      if (!(m_elinkmap[i]->serial_available())) continue;
-      bit2 = m_elinkmap[i]->get_serial();
-      m_cur_word[i*2]   = bit1 & 1;
-      m_cur_word[i*2+1] = bit2 & 1;
+      if (!(mElinkMap[i]->SerialAvailable())) continue;
+      bit1 = mElinkMap[i]->GetSerial();
+      if (!(mElinkMap[i]->SerialAvailable())) continue;
+      bit2 = mElinkMap[i]->GetSerial();
+      mCurWord[i*2]   = bit1 & 1;
+      mCurWord[i*2+1] = bit2 & 1;
       active_responder++;
     }
     else {
-      m_cur_word[i*2]   = 0;
-      m_cur_word[i*2+1] = 0;
+      mCurWord[i*2]   = 0;
+      mCurWord[i*2+1] = 0;
     }
   }
-  if (active_responder == m_nb_rec) {
+  if (active_responder == mNbRec) {
     //
     // all link have returned data, push word for sending
     //
-    m_send_list.push_back(m_cur_word);
+    mSendList.push_back(mCurWord);
   }
-  return (active_responder == m_nb_rec);
+  return (active_responder == mNbRec);
 }
 
-std::bitset<128> gbt_s::get_word()
+std::bitset<128> GbtS::GetWord()
 {
 std::bitset<128>   word;
 
-  if (m_send_list.size() ==0) return -1;
-  word = m_send_list.front() ;
-  m_send_list.pop_front();
+  if (mSendList.size() ==0) return -1;
+  word = mSendList.front() ;
+  mSendList.pop_front();
   return word;
 }

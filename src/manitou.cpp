@@ -4,19 +4,19 @@
 
 using namespace std;
 
-manitou* manitou::Instance = 0;
-int      manitou::dsmapid  = 0;
+Manitou* Manitou::Instance = 0;
+int      Manitou::mDsMapId  = 0;
 
-manitou* manitou::getInstance()
+Manitou* Manitou::GetInstance()
 {
-  if (Instance == 0) Instance = new manitou();
+  if (Instance == 0) Instance = new Manitou();
   return Instance;
 }
 
-manitou::manitou()
+Manitou::Manitou()
 {
   cout <<"Manitou created" << endl; 
-  dsmap.clear();
+  mDsMap.clear();
 }
 /*!
  *  \brief Creates dualsampa object and assign a reference
@@ -26,12 +26,12 @@ manitou::manitou()
  *
  *  \return dualsampa object reference
  */
-int manitou::create_dualsampa(uint8_t addr1,uint8_t addr2)
+int Manitou::CreateDualSampa(uint8_t addr1,uint8_t addr2)
 {
-  dsmapid++;
-  dsmap[dsmapid] = new dualsampa(addr1,addr2);
-  dsmap[dsmapid]->set_internal_ref(dsmapid);
-  return dsmapid;
+  mDsMapId++;
+  mDsMap[mDsMapId] = new DualSampa(addr1,addr2);
+  mDsMap[mDsMapId]->SetInternalRef(mDsMapId);
+  return mDsMapId;
 }
 /*!
  *  \brief Creates dualsampa object and assign a reference
@@ -43,16 +43,16 @@ int manitou::create_dualsampa(uint8_t addr1,uint8_t addr2)
  * \throws std::expection
  *
  */
-void manitou::delete_dualsampa(int ref)
+void Manitou::DeleteDualSampa(int ref)
 {
-  if (dsmap.find(ref) ==dsmap.end()) throw std::logic_error("unkown reference");
-  delete dsmap[ref];
-  dsmap.erase(ref);
+  if (mDsMap.find(ref) ==mDsMap.end()) throw std::logic_error("unkown reference");
+  delete mDsMap[ref];
+  mDsMap.erase(ref);
 }
 
-dualsampa *manitou::get_dualsampa(int ref)
+DualSampa *Manitou::GetDualSampa(int ref)
 {
-  if (dsmap.find(ref) ==dsmap.end()) throw std::logic_error("unkown reference");
-  return dsmap[dsmapid];
+  if (mDsMap.find(ref) ==mDsMap.end()) throw std::logic_error("unkown reference");
+  return mDsMap[ref];
 }
 

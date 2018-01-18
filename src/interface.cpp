@@ -21,7 +21,7 @@
  */
 extern "C" int create_dualsampa(int ad1,int ad2)
 {
-  return manitou::getInstance()->create_dualsampa(ad1,ad2); 
+  return Manitou::GetInstance()->CreateDualSampa(ad1,ad2); 
 }
 /*!
  *  \function delete_dualsampa
@@ -34,7 +34,7 @@ extern "C" int create_dualsampa(int ad1,int ad2)
 extern "C" int delete_dualsampa(int id)
 {
   try {
-    manitou::getInstance()->delete_dualsampa(id);
+    Manitou::GetInstance()->DeleteDualSampa(id);
   }
   catch (const std::exception & e)
   {
@@ -47,7 +47,7 @@ extern "C" int delete_dualsampa(int id)
 extern "C" int reset_frames(int id)
 {
   try {
-    manitou::getInstance()->get_dualsampa(id)->reset_frames();
+    Manitou::GetInstance()->GetDualSampa(id)->ResetFrames();
   }
   catch (const std::exception & e)
   {
@@ -61,7 +61,7 @@ extern "C" int reset_frames(int id)
 extern "C" int add_data(int id,int sampaid,int len,unsigned short *buffer)
 {
   try {
-    manitou::getInstance()->get_dualsampa(id)->add_data(sampaid,len,buffer);
+    Manitou::GetInstance()->GetDualSampa(id)->AddData(sampaid,len,buffer);
   }
   catch (const std::exception & e)
   {
@@ -75,7 +75,7 @@ extern "C" int add_data(int id,int sampaid,int len,unsigned short *buffer)
 extern "C" int send_frames(int id)
 {
   try {
-    manitou::getInstance()->get_dualsampa(id)->send_frames();
+    Manitou::GetInstance()->GetDualSampa(id)->SendFrames();
   }
   catch (const std::exception & e)
   {
@@ -89,7 +89,7 @@ extern "C" int send_frames(int id)
 extern "C" int set_data_provider(int id,void (*user_handler)(int))
 {
   try {
-    manitou::getInstance()->get_dualsampa(id)->set_data_provider(user_handler);
+    Manitou::GetInstance()->GetDualSampa(id)->SetDataProvider(user_handler);
   }
   catch (const std::exception & e)
   {

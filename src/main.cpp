@@ -5,22 +5,22 @@
 #include "sampa.h"
 #include "dualsampa.h"
 #include "receiver.h"
-#include "gbt_s.h"
-#include "gbt_r.h"
+#include "GbtS.h"
+#include "GbtR.h"
 #include "manitou.h"
 #include "interface.h"
-#include "Test.h"
+//#include "Test.h"
 using namespace std;
 
 #define  NBT 100
 
-sampa sampa_0(0);
-dualsampa ds(10,12);
-gbt_s    gbt_s1;
+Sampa sampa_0(0);
+DualSampa ds(10,12);
+GbtS     gbt_s1;
 gbt_r    gbt_r1(gbt_s1);
-receiver rec(0,gbt_r1);
-dualsampa ds1(22,24);
-receiver rec1(1,gbt_r1);
+Receiver rec(0,gbt_r1);
+DualSampa ds1(22,24);
+Receiver rec1(1,gbt_r1);
 int dsid =0;
 int loop = 500;//00000;
 
@@ -33,13 +33,13 @@ void dsp_handler(int ref)
   for (int i = 0;i<32;i++)
   {
     ds.select_channel(0,i);
-    ds.reset_frames();
+    ds.ResetFrames();
     data[2]=i+loop*32;
-    ds.add_data(0,4,data);
-    ds.send_frames();
+    ds.AddData(0,4,data);
+    ds.SendFrames();
   }
 #endif    
-  ds.regenerate_data();
+  ds.RegenerateData();
   return;  
   //cout << "DSP handler "<< std::dec <<ref  << endl; 
  }
@@ -52,14 +52,14 @@ void dsp_handler1(int ref)
 #if 0
   for (int i = 0;i<32;i++)
   {
-    ds1.select_channel(0,i);
-    ds1.reset_frames();
+    ds1.SelectChannel(0,i);
+    ds1.ResetFrames();
     data[2]=i;
-    ds1.add_data(0,4,data);
-    ds1.send_frames();
+    ds1.AddData(0,4,data);
+    ds1.SendFrames();
   }
 #endif    
-  ds1.regenerate_data();
+  ds1.RegenerateData();
   return;  
   //cout << "DSP handler "<< std::dec <<ref  << endl; 
  }
@@ -83,18 +83,18 @@ void rec_handler1(int addr,int ch,int nbsamp,int ts,int len, short *buff)
 int main()
 {
   try {
-  ds.set_data_provider(dsp_handler);
-  ds.set_internal_ref(0);
-  rec.set_userhandler(rec_handler);
-  gbt_s1.plug_elink(0,&ds);
-  rec.start();
-  ds1.set_data_provider(dsp_handler1); 
-  ds1.set_internal_ref(10);
-  rec1.set_userhandler(rec_handler1);
-   gbt_s1.plug_elink(1,&ds1);
-  rec1.start();
-  rec.join();
-  rec1.join();
+  ds.SetDataProvider(dsp_handler);
+  ds.SetInternalRef(0);
+  rec.SetUserHandler(rec_handler);
+  gbt_s1.PlugElink(0,&ds);
+  rec.Start();
+  ds1.SetDataProvider(dsp_handler1); 
+  ds1.SetInternalRef(10);
+  rec1.SetUserHandler(rec_handler1);
+   gbt_s1.PlugElink(1,&ds1);
+  rec1.Start();
+  rec.Join();
+  rec1.Join();
   }
   catch (const std::exception& e)
   {

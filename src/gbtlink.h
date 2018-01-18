@@ -6,8 +6,8 @@
 class gbtlink
 {
 public:
-  ~gbtlink() {}
-  virtual bool gbtword_available()=0; 
-  virtual std::bitset<128> get_word()=0;
+  virtual ~gbtlink() {}
+  virtual bool GbtWordAvailable()=0; 
+  virtual std::bitset<128> GetWord()=0;
 };
 #endif

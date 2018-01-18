@@ -12,19 +12,19 @@ using namespace std;
  *  Each accessible object is 'referenced' by an unique ID (provided at object creation and can only be accessed through this reference.\n
  *  This class is implmeneted as a singleton.
  */
-class manitou
+class Manitou
 {
-static manitou *Instance;
+static Manitou *Instance;
 
 public:
-  static manitou *getInstance();
-  int create_dualsampa(uint8_t addr1,uint8_t addr2);
-  void delete_dualsampa(int ref);
-  dualsampa *get_dualsampa(int ref);
+  static Manitou *GetInstance();
+  int CreateDualSampa(uint8_t addr1,uint8_t addr2);
+  void DeleteDualSampa(int ref);
+  DualSampa *GetDualSampa(int ref);
 private:
-  manitou();
-  static int           dsmapid;
-  map<int,dualsampa *> dsmap;
+  Manitou();
+  static int           mDsMapId;
+  map<int,DualSampa *> mDsMap;
   
 };
 #endif
