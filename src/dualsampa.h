@@ -18,6 +18,7 @@ public:
 class dualsampa  : public elink
 {
 public:
+  dualsampa(){};       // makes constructor unavailable
   explicit dualsampa(uint16_t addr1,uint16_t addr2);
   ~dualsampa();
   void set_internal_ref(int ref);
@@ -37,7 +38,6 @@ public:
   uint8_t get_serial() ;
 
 private:
-   dualsampa();       // makes constructor unavailable
    
    sampa             *m_sampas[2];
    

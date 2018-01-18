@@ -4,6 +4,16 @@
 #include "sampa_head.h"
 using namespace std;
 
+/*!
+ *  \brief dualsampa chip emulator
+ *
+ *  This class provides a emulation artefacts for dualsampa chip serialisation mechanism.\n
+ *  it prodives methods to build dsp generated build frames and methods to emulate serial link.
+ *
+ *  \param addr1 : hardware address of the first sampa chip
+ *  \param addr2 : hardware address of the first sampa chip
+ */
+
 dualsampa::dualsampa(uint16_t addr1,uint16_t addr2)
 {
   // creates the two samaps
@@ -23,6 +33,9 @@ dualsampa::dualsampa(uint16_t addr1,uint16_t addr2)
 dualsampa::~dualsampa()
 {
   cout <<"DualSampa deleted " << endl; 
+  //
+  // release sampas objects
+  //
   delete m_sampas[0];
   delete m_sampas[1];
 }
@@ -46,11 +59,30 @@ void dualsampa::select_channel(const uint8_t sId,const uint8_t chid)
   }
  
 }
+/*!
+ *  \brief starts a new frame
+ *
+ *  internal buffer of the two sampa is reset and ready to receives new data samples.\n
+ *  the frame header will be automatically build when frame will be 'sent out'.\n
+ *  If the previous frame has not been sent, it will be lost
+ *  
+ *  \param 
+ */
+
 void dualsampa::reset_frames()
 {
   m_sampas[0]->reset_frame();
   m_sampas[1]->reset_frame();
 }
+/*!
+ *  \brief starts a new frame
+ *
+ *  internal buffer of a given sampa is reset and ready to receives new data samples.\n
+ *  the frame header will be automatically build when frame will be 'sent out'.\n
+ *  If the previous frame has not been sent, it will be lost
+ *  
+ *  \param sId sampa identifier
+ */
 
 void dualsampa::reset_frame(const uint8_t sId)
 {
@@ -58,6 +90,16 @@ void dualsampa::reset_frame(const uint8_t sId)
     m_sampas[sId]->reset_frame();
   }
 }
+
+/*!
+ *  \brief Add a data chunk to current frame
+ *
+ *  \param len  length of the data chunk
+ *  \param data adresse of the buffer 
+ *  
+ *  \param sId sampa identifier
+ */
+
 void dualsampa::add_data(const uint8_t sId,int len, uint16_t *data)
 {
   if ((sId == 0) || (sId == 1)) {
@@ -65,12 +107,24 @@ void dualsampa::add_data(const uint8_t sId,int len, uint16_t *data)
   }
 }
 
+/*!
+ *  \brief send frame over serial link for the selected sampa chip
+ *  
+ *  \param sId sampa identifier
+ */
+
 void dualsampa::send_frame(const uint8_t sId)
 {
   if ((sId == 0) || (sId == 1)) {
     m_sampas[sId]->send_frame();
   }
 }
+
+/*!
+ *  \brief send frames over serial link
+ *  
+ */
+
 void dualsampa::send_frames()
 {
   m_sampas[0]->send_frame();
@@ -84,12 +138,27 @@ void dualsampa::regenerate_data()
   m_send_credit    = 8192; // 8192 bit to be sent per window 
                          //(10 mhz sampling rate)
 }
+
+/*!
+ *  \brief force sampa to insert a sunc packet in current frame
+ *  
+ *  \param sId sampa identifier
+ */
+
+
 void dualsampa::make_sync(const uint8_t sId)
 {
   if ((sId == 0) || (sId == 1)) {
     m_sampas[sId]->make_sync();
   }
 }
+
+/*!
+ *  \brief check data availability
+ *  
+ *  \return true is some data is available, false otherwise
+ */
+
 bool dualsampa::serial_available()
 {
   // check credit exhausted
@@ -114,6 +183,12 @@ bool dualsampa::serial_available()
   // data available
   return true;
 }
+
+/*!
+ *  \brief fetch a data bit
+ *  
+ *  \return data bit in the LSB bit of returned value
+ */
 
 uint8_t dualsampa::get_serial()
 {
