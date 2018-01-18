@@ -5,8 +5,8 @@ EXEC_NAME = ../bin/Sampa_simu.out
 LIB_NAME = ../lib/Sampa_simu.a 
 INCLUDES =
 LIBS = -lstdc++ -lpthread
-SRC_FILES = $(wildcard *.cpp)
-OBJ_FILES = $(SRC_FILES:%.cpp=../obj/%.o) 
+SRC_FILES = $(wildcard *.cxx)
+OBJ_FILES = $(SRC_FILES:%.cxx=../obj/%.o) 
 INSTALL_DIR = /usr/bin
 
 all : $(EXEC_NAME)
@@ -21,6 +21,9 @@ $(EXEC_NAME) : $(OBJ_FILES)
 	$(CC) -o $(EXEC_NAME) $(OBJ_FILES) $(LIBS)
 
 ../obj/%.o: %.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) -o $@ -c $<
+
+../obj/%.o: %.cxx
 	$(CC) $(CFLAGS) $(INCLUDES) -o $@ -c $<
 
 ../obj/%.o: %.cc
