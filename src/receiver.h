@@ -2,7 +2,7 @@
 #define RECEIVER
 #include <thread>
 #include "sampa_head.h"
-#include "Elink.h"
+#include "elink.h"
 #include "GBT_r.h"
 
 class receiver_handler

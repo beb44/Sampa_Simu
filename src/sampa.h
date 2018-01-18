@@ -2,7 +2,7 @@
 #define SAMPA
 #include <cstdint>
 #include <list>
-#include "Elink.h"
+#include "elink.h"
 /*!
  *  \brief sampa chip emulator
  *
