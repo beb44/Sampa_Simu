@@ -14,48 +14,48 @@ using namespace std;
  *  \param addr2 : hardware address of the first sampa chip
  */
 
-dualsampa::dualsampa(uint16_t addr1,uint16_t addr2)
+DualSampa::DualSampa(uint16_t addr1,uint16_t addr2)
 {
   // creates the two samaps
-  m_sampas[0] = new sampa(addr1);
-  m_sampas[1] = new sampa(addr2);  
+  mSampas[0] = new Sampa(addr1);
+  mSampas[1] = new Sampa(addr2);  
   
-  m_syncpacket       = sampa_head().build_sync();
-  m_sync_countdown   = 50; // no sync packet to be sent (for the moment)
-  m_send_credit      = 0; // 8192 bit to be sent per window 
+  mSyncPacket       = sampa_head().build_sync();
+  mSyncCountdown   = 50; // no sync packet to be sent (for the moment)
+  mSendCredit      = 0; // 8192 bit to be sent per window 
                          //(10 mhz sampling rate)
-  m_internal_ref     = 0;
+  mInternalRef     = 0;
   m_c_data_provider  = NULL;
-  handler_dsp        = NULL;
-  m_data_regenerated = false;
+  mHandlerDsp        = NULL;
+  mDataRegenerated = false;
 } 
 
-dualsampa::~dualsampa()
+DualSampa::~DualSampa()
 {
   cout <<"DualSampa deleted " << endl; 
   //
   // release sampas objects
   //
-  delete m_sampas[0];
-  delete m_sampas[1];
+  delete mSampas[0];
+  delete mSampas[1];
 }
-void dualsampa::set_internal_ref(int ref)
+void DualSampa::SetInternalRef(int ref)
 {
-  m_internal_ref= ref;
+  mInternalRef= ref;
 }
-void dualsampa::set_data_provider(void (*uh)(int))
+void DualSampa::SetDataProvider(void (*uh)(int))
 {
   m_c_data_provider = uh;
 }
-void dualsampa::set_data_provider(dualsampa_handler *handler)
+void DualSampa::SetDataProvider(DualSampaHandler *handler)
 {
-  handler_dsp = handler;
+  mHandlerDsp = handler;
 }
 
-void dualsampa::select_channel(const uint8_t sId,const uint8_t chid)
+void DualSampa::SelectChannel(const uint8_t sId,const uint8_t chid)
 {
   if ((sId == 0) || (sId == 1)) {
-    m_sampas[sId]->select_channel(chid);
+    mSampas[sId]->SelectChannel(chid);
   }
  
 }
@@ -69,10 +69,10 @@ void dualsampa::select_channel(const uint8_t sId,const uint8_t chid)
  *  \param 
  */
 
-void dualsampa::reset_frames()
+void DualSampa::ResetFrames()
 {
-  m_sampas[0]->reset_frame();
-  m_sampas[1]->reset_frame();
+  mSampas[0]->ResetFrame();
+  mSampas[1]->ResetFrame();
 }
 /*!
  *  \brief starts a new frame
@@ -84,10 +84,10 @@ void dualsampa::reset_frames()
  *  \param sId sampa identifier
  */
 
-void dualsampa::reset_frame(const uint8_t sId)
+void DualSampa::ResetFrame(const uint8_t sId)
 {
   if ((sId == 0) || (sId == 1)) {
-    m_sampas[sId]->reset_frame();
+    mSampas[sId]->ResetFrame();
   }
 }
 
@@ -100,10 +100,10 @@ void dualsampa::reset_frame(const uint8_t sId)
  *  \param sId sampa identifier
  */
 
-void dualsampa::add_data(const uint8_t sId,int len, uint16_t *data)
+void DualSampa::AddData(const uint8_t sId,int len, uint16_t *data)
 {
   if ((sId == 0) || (sId == 1)) {
-    m_sampas[sId]->add_data(len,data); 
+    mSampas[sId]->AddData(len,data); 
   }
 }
 
@@ -113,10 +113,10 @@ void dualsampa::add_data(const uint8_t sId,int len, uint16_t *data)
  *  \param sId sampa identifier
  */
 
-void dualsampa::send_frame(const uint8_t sId)
+void DualSampa::SendFrame(const uint8_t sId)
 {
   if ((sId == 0) || (sId == 1)) {
-    m_sampas[sId]->send_frame();
+    mSampas[sId]->SendFrame();
   }
 }
 
@@ -125,17 +125,17 @@ void dualsampa::send_frame(const uint8_t sId)
  *  
  */
 
-void dualsampa::send_frames()
+void DualSampa::SendFrames()
 {
-  m_sampas[0]->send_frame();
-  m_sampas[1]->send_frame();
+  mSampas[0]->SendFrame();
+  mSampas[1]->SendFrame();
 }
 
-void dualsampa::regenerate_data()
+void DualSampa::RegenerateData()
 {
-  m_data_regenerated = true;
+  mDataRegenerated = true;
   // reset credit
-  m_send_credit    = 8192; // 8192 bit to be sent per window 
+  mSendCredit    = 8192; // 8192 bit to be sent per window 
                          //(10 mhz sampling rate)
 }
 
@@ -146,10 +146,10 @@ void dualsampa::regenerate_data()
  */
 
 
-void dualsampa::make_sync(const uint8_t sId)
+void DualSampa::MakeSync(const uint8_t sId)
 {
   if ((sId == 0) || (sId == 1)) {
-    m_sampas[sId]->make_sync();
+    mSampas[sId]->MakeSync();
   }
 }
 
@@ -159,26 +159,26 @@ void dualsampa::make_sync(const uint8_t sId)
  *  \return true is some data is available, false otherwise
  */
 
-bool dualsampa::serial_available()
+bool DualSampa::SerialAvailable()
 {
   // check credit exhausted
    // check if credit is exhausted
-  if (m_send_credit == 0)  {
+  if (mSendCredit == 0)  {
     // 
     // if user handler available, call it to regenerate date
     //
     if (m_c_data_provider) {  
-      m_data_regenerated = false;
-      m_c_data_provider(m_internal_ref);
-      return m_data_regenerated;
+      mDataRegenerated = false;
+      m_c_data_provider(mInternalRef);
+      return mDataRegenerated;
     }
-    if (handler_dsp)  {  
-      m_data_regenerated = false;
-      handler_dsp->dsp_handler(m_internal_ref);
-      return m_data_regenerated;
+    if (mHandlerDsp)  {  
+      mDataRegenerated = false;
+      mHandlerDsp->DspHandler(mInternalRef);
+      return mDataRegenerated;
     }
     // no more data available
-    return false;	
+    return false;	 
   }
   // data available
   return true;
@@ -190,28 +190,28 @@ bool dualsampa::serial_available()
  *  \return data bit in the LSB bit of returned value
  */
 
-uint8_t dualsampa::get_serial()
+uint8_t DualSampa::GetSerial()
 {
   // check if credit is exhausted
-  if (m_send_credit == 0) 
+  if (mSendCredit == 0) 
    return 0xff; 
-  m_send_credit --;
+  mSendCredit --;
   // 
   // check if sync packet is being transmitted
   //
-  if (m_sync_countdown) {
-    m_sync_countdown--;
-    return (m_syncpacket>>(49-m_sync_countdown)) & 1;
+  if (mSyncCountdown) {
+    mSyncCountdown--;
+    return (mSyncPacket>>(49-mSyncCountdown)) & 1;
   }
   //
   // check normal data packets
   //
-  if (m_sampas[0]->serial_available()) return m_sampas[0]->get_serial();
-  if (m_sampas[1]->serial_available()) return m_sampas[1]->get_serial();
+  if (mSampas[0]->SerialAvailable()) return mSampas[0]->GetSerial();
+  if (mSampas[1]->SerialAvailable()) return mSampas[1]->GetSerial();
   //
   // no data packet available, send out sync packet
   //
-  m_sync_countdown = 49; // after send first sync bit, there will remain
+  mSyncCountdown = 49; // after send first sync bit, there will remain
                          // 49 bits
-  return (m_syncpacket>>0) & 1;
+  return (mSyncPacket>>0) & 1;
 }

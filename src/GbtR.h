@@ -6,47 +6,46 @@
 #include <condition_variable>
 #include <sys/types.h>
 #include <semaphore.h>
-#include "elink.h"
+#include "Elink.h"
 #include "gbtlink.h"
-class gbt_gen
+class GbtGen
 {
 public:
    virtual bool    fetch(int port,int sample)=0;
    virtual uint8_t read(int port,int sample)=0;
 };
-class gbt_elink : public elink
+class GbtElink : public Elink
 {
 public:
-  gbt_elink(int port,gbt_gen& gbt);
-  bool serial_available(); 
-  uint8_t get_serial(); 
+  GbtElink(int port,GbtGen& gbt);
+  bool SerialAvailable(); 
+  uint8_t GetSerial(); 
   void  lock();
   void  unlock();
 private:
-  gbt_gen&    m_gbt;
-  int         m_port;
-  int         m_sample;
-  sem_t	      m_wait_sem;
+  GbtGen&     mGbt;
+  int         mPort;
+  int         mSample;
+  sem_t	      mWaitSem;
 };
 
-class gbt_r: public gbt_gen
+class gbt_r: public GbtGen
 {
 public:
   gbt_r(gbtlink &provider);
-  elink   &get_elink(int const port);
+  Elink   &get_elink(int const port);
   bool    fetch(int const port,int const sample) ;
   uint8_t read(int const port,int const sample);
 private:
-  bool                         m_started;
-  static const int             m_maxsocket = 40;
-  gbtlink                      &m_data_provider;
-  std::map<int,gbt_elink *>    m_elink_map;
-  int                          m_cur_sample;
-  int                          m_nb_sample_readers;
-  int                          m_nb_links;
-  std::bitset<128>  	       m_curword;
-  bool                         m_data_available;
-  std::mutex		       m_mutex;
+  bool                         mStarted;
+  gbtlink                      &mDataProvider;
+  std::map<int,GbtElink *>     mElinkMap;
+  int                          mCurSample;
+  int                          mNbSampleReaders;
+  int                          mNbLinks;
+  std::bitset<128>  	       mCurWord;
+  bool                         mDataAvailable;
+  std::mutex		       mMutex;
  
 };
 #endif

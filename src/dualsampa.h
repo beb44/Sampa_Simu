@@ -2,52 +2,52 @@
 #define DUALSAMPA
 #include <cstdint>
 #include "sampa.h"
-#include "elink.h"
+#include "Elink.h"
 /*!
  *  \brief dualsampa chip emulator
  *
  *  This class provides a emulation artefacts for dualsampa chip serialisation mechanism.\n
  *  
  */
-class dualsampa_handler
+class DualSampaHandler
 {
 public:
-  virtual void dsp_handler(int ref) = 0;
+  virtual void DspHandler(int ref) = 0;
 };
 
-class dualsampa  : public elink
+class DualSampa  : public Elink
 {
 public:
-  dualsampa(){};       // makes constructor unavailable
-  explicit dualsampa(uint16_t addr1,uint16_t addr2);
-  ~dualsampa();
-  void set_internal_ref(int ref);
-  void set_data_provider(void (*uh)(int));
-  void set_data_provider(dualsampa_handler *handler);
-  void select_channel(const uint8_t sId,const uint8_t chid);
-  void reset_frames();
-  void reset_frame(const uint8_t sId);
-  void add_data(const uint8_t sId,int len, uint16_t *data);
-  void send_frame(const uint8_t sId);
-  void send_frames();
-  void regenerate_data();
+  DualSampa(){};       // makes constructor unavailable
+  explicit DualSampa(uint16_t addr1,uint16_t addr2);
+  ~DualSampa();
+  void SetInternalRef(int ref);
+  void SetDataProvider(void (*uh)(int));
+  void SetDataProvider(DualSampaHandler *handler);
+  void SelectChannel(const uint8_t sId,const uint8_t chid);
+  void ResetFrames();
+  void ResetFrame(const uint8_t sId);
+  void AddData(const uint8_t sId,int len, uint16_t *data);
+  void SendFrame(const uint8_t sId);
+  void SendFrames();
+  void RegenerateData();
 
-  void make_sync(const uint8_t sId);
+  void MakeSync(const uint8_t sId);
   
-  bool    serial_available() ; 
-  uint8_t get_serial() ;
+  bool    SerialAvailable() ; 
+  uint8_t GetSerial() ;
 
 private:
    
-   sampa             *m_sampas[2];
+   Sampa             *mSampas[2];
    
-   uint64_t          m_syncpacket;
-   int               m_sync_countdown;
-   int               m_send_credit;
+   uint64_t          mSyncPacket;
+   int               mSyncCountdown;
+   int               mSendCredit;
    
-   int	             m_internal_ref;
+   int	             mInternalRef;
    void              (*m_c_data_provider)(int);
-   dualsampa_handler *handler_dsp;
-   bool              m_data_regenerated;
+   DualSampaHandler  *mHandlerDsp;
+   bool              mDataRegenerated;
 };
 #endif
