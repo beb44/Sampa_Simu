@@ -111,7 +111,6 @@ int      payload_length;
           packetcount_by_type[sampa_head().get_packet_type(m_curhead)]++;
 	  packetcount++;
 #endif	
-          cout << m_syncpos << " "<< std::bitset<50>( m_curhead ) << "payload length " << payload_length << endl;
 	  if (payload_length == 0) {
 	    // zero length packet, catch next header
 	    m_headcd = 50; // 50 bit of header to be read
@@ -125,14 +124,10 @@ int      payload_length;
 	}
       }
       else {
-        //cout << "normal data reception "<< endl;	
         // data reception
 	*m_wpointer =  ((*m_wpointer) )+((uint64_t)(m_peer.get_serial())<<m_cur_bit);
-	//cout << "partial word received " << std::bitset<10> (*m_wpointer)  << endl;
-	//m_peer->get_serial();
 	m_cur_bit++;	
         if (m_cur_bit==10) {
-	  //cout << "complete word received " << std::bitset<10> (*m_wpointer)  << endl;
           // all bits in current word have been sent out
           m_wpointer++;
           *m_wpointer = 0;
@@ -140,9 +135,6 @@ int      payload_length;
 	  m_cur_len++;
 	  if (m_cur_len == payload_length)  {
 	     m_headcd = 50; // 50 bit of header to be read
-	     cout << "complete data packet received " << m_cur_len << endl;
-             for (int i=0;i<m_cur_len;i++) cout << m_frame[i] << " " ; 
-             cout << endl;
 	     handle_packet(m_curhead,payload_length,m_frame);
 	   }
          }
@@ -152,10 +144,8 @@ int      payload_length;
       m_syncpos++;
       m_curhead = ((m_curhead >>1) + (((uint64_t)(m_peer.get_serial()))<<49)) & 0x3ffffffffffff;
       if (m_curhead == m_synchead) {
-        // cout << m_syncpos << " "<< std::bitset<50>( m_curhead )<< "-"   << std::hex <<
 	//m_curhead << "payload length " << payload_length << endl;
         m_is_synced= true;
-	cout <<"receiver: Synchronisation trouvee au bit" << (m_syncpos-50) << endl;   
 	m_headcd = 50; // 50 bit of header to be read
 #ifdef STATS
         packetcount_by_type[sampa_head().get_packet_type(m_curhead)]++;
