@@ -1,3 +1,5 @@
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
 add_library(sampabase SHARED
         Bits128.h
@@ -28,7 +30,7 @@ add_library(sampareceiver SHARED
         Receiver.cxx
         Receiver.h
         )
-target_link_libraries(sampareceiver PUBLIC sampabase)
+target_link_libraries(sampareceiver PUBLIC sampabase Threads::Threads)
 
 add_executable(sampaTest main.cxx)
 target_link_libraries(sampaTest sampasender sampareceiver)
