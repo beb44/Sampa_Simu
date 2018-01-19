@@ -5,6 +5,7 @@
 #include <list>
 #include "GbtLink.h"
 #include "Elink.h"
+#include "Bits128.h"
 
 class GbtS: public gbtlink
 {
@@ -14,13 +15,13 @@ public:
   void Process();
   
   bool              GbtWordAvailable();
-  std::bitset<128>  GetWord();
+  Bits128           GetWord();
 private:
-  static const int   mMaxSocket = 40;
-  Elink                        *mElinkMap[mMaxSocket];
-  std::bitset<128>             mCurWord;
-  std::list<std::bitset<128>>  mSendList;
-  int                          mNbRec;
+  static const int    mMaxSocket = 40;
+  Elink               *mElinkMap[mMaxSocket];
+  Bits128             mCurWord;
+  std::list<Bits128>  mSendList;
+  int                 mNbRec;
    
 };
 #endif

@@ -77,7 +77,7 @@ void Receiver::HandlePacket(const uint64_t header,int len,uint16_t *buffer)
 {
 SampaHead  head_decoder(header);
 
-  SampaHead().Decode(); 
+  head_decoder.Decode(); 
   //head_decoder.display();
   if (user_handler) user_handler(head_decoder.mFChipAddress,
   			         head_decoder.mFChannelAddress,

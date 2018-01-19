@@ -24,19 +24,17 @@ int loop = 500;//00000;
 
 void dsp_handler(int ref)
 {
-//uint16_t data[4] = {7,2,0x1,0x20}; 
+uint16_t data[4] = {7,2,0x1,0x20}; 
   // stops when max number of loops reached
   if (loop-- == 0) return;
-#if 0
   for (int i = 0;i<32;i++)
   {
-    ds.select_channel(0,i);
+    ds.SelectChannel(0,i);
     ds.ResetFrames();
-    data[2]=i+loop*32;
+    data[2]=i;
     ds.AddData(0,4,data);
     ds.SendFrames();
   }
-#endif    
   ds.RegenerateData();
   return;  
   //cout << "DSP handler "<< std::dec <<ref  << endl; 
@@ -44,10 +42,9 @@ void dsp_handler(int ref)
  #if 1
 void dsp_handler1(int ref)
 {
-//uint16_t data[4] = {7,2,0x1,0x20}; 
+uint16_t data[4] = {7,2,0x1,0x20}; 
   // stops when max number of loops reached
   if (loop-- == 0) return;
-#if 0
   for (int i = 0;i<32;i++)
   {
     ds1.SelectChannel(0,i);
@@ -56,7 +53,6 @@ void dsp_handler1(int ref)
     ds1.AddData(0,4,data);
     ds1.SendFrames();
   }
-#endif    
   ds1.RegenerateData();
   return;  
   //cout << "DSP handler "<< std::dec <<ref  << endl; 
@@ -64,15 +60,15 @@ void dsp_handler1(int ref)
 #endif
 void rec_handler(int addr,int ch,int nbsamp,int ts,int len, short *buff)
 {
-  cout << "Packet recieved "<< std::dec <<addr << " " << buff[0] << endl; 
-  if (len != 2)
+  //cout << "Packet recieved "<< std::dec <<addr << " " << buff[0] << endl; 
+  if (buff[0] != ch)
   {
     throw "horreur"; 
   }
 }
 void rec_handler1(int addr,int ch,int nbsamp,int ts,int len, short *buff)
 {
-  cout << "Packet recieved ++++"<< std::dec <<addr << " " << buff[0] << endl; 
+ // cout << "Packet recieved ++++"<< std::dec <<addr << " " << buff[0] << endl; 
   if (len != 2)
   {
     throw "horreur"; 

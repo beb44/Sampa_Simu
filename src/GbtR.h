@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <sys/types.h>
 #include <semaphore.h>
+#include "Bits128.h"
 #include "Elink.h"
 #include "GbtLink.h"
 class GbtGen
@@ -43,7 +44,7 @@ private:
   int                          mCurSample;
   int                          mNbSampleReaders;
   int                          mNbLinks;
-  std::bitset<128>  	       mCurWord;
+  Bits128  	               mCurWord;
   bool                         mDataAvailable;
   std::mutex		       mMutex;
  

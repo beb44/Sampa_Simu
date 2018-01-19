@@ -1,5 +1,6 @@
 #include <iostream>
 #include "GbtS.h"
+#include "Bits128.h"
 using namespace std;
 GbtS::GbtS() 
 {
@@ -36,13 +37,13 @@ uint8_t bit2;
 	  continue;
 	}
 	bit2 = mElinkMap[i]->GetSerial();
-	mCurWord[i*2]   = bit1 & 1;
-	mCurWord[i*2+1] = bit2 & 1;
+        mCurWord.Set(i*2,bit1 & 1);
+        mCurWord.Set(i*2+1, bit2 & 1);
 	active_responder++;
       }
       else {
-	mCurWord[i*2]   = 0;
-	mCurWord[i*2+1] = 0;
+        mCurWord.Set(i*2,0);
+        mCurWord.Set(i*2+1,0);
       }
     }
     if (active_responder == mNbRec) {
@@ -69,13 +70,13 @@ uint8_t bit2;
       bit1 = mElinkMap[i]->GetSerial();
       if (!(mElinkMap[i]->SerialAvailable())) continue;
       bit2 = mElinkMap[i]->GetSerial();
-      mCurWord[i*2]   = bit1 & 1;
-      mCurWord[i*2+1] = bit2 & 1;
+      mCurWord.Set(i*2,bit1 & 1);
+      mCurWord.Set(i*2+1, bit2 & 1);
       active_responder++;
     }
     else {
-      mCurWord[i*2]   = 0;
-      mCurWord[i*2+1] = 0;
+      mCurWord.Set(i*2,0);
+      mCurWord.Set(i*2+1,0);
     }
   }
   if (active_responder == mNbRec) {
@@ -87,11 +88,11 @@ uint8_t bit2;
   return (active_responder == mNbRec);
 }
 
-std::bitset<128> GbtS::GetWord()
+Bits128 GbtS::GetWord()
 {
-std::bitset<128>   word;
+Bits128   word;
 
-  if (mSendList.size() ==0) return -1;
+  if (mSendList.size() ==0) return Bits128(0xff,0xff,0xff,0xff);  
   word = mSendList.front() ;
   mSendList.pop_front();
   return word;

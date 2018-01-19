@@ -89,5 +89,5 @@ bool gbt_r::fetch(int const port,int const sample)
 
 uint8_t gbt_r::read(int const port,int const sample)
 {
-  return mCurWord[port*2+(sample & 1)];
+  return mCurWord.Get(port*2+(sample & 1));
 }
