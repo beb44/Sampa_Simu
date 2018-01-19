@@ -58,11 +58,11 @@ void Sampa::AddData(int const len, uint16_t const *data)
 
 void Sampa::MakeSync()
 {
-sampa_head header;
+SampaHead header;
 uint64_t   res;
 
 
-   res= header.build_sync();
+   res= header.BuildSync();
    mFrame[0]= (res >> 0  ) & 0x3ff;
    mFrame[1]= (res >> 10 ) & 0x3ff;
    mFrame[2]= (res >> 20 ) & 0x3ff;
@@ -73,18 +73,18 @@ uint64_t   res;
 
 void Sampa::MakeDataHeader()
 {
-sampa_head header;
+SampaHead header;
 uint64_t   res;
 
-   header.fHammingCode          = 0x3f;
-   header.fHeaderParity         = 0;
-   header.fPkgType              = 4;
-   header.fNbOf10BitWords       = mWPointer-5; 
-   header.fChipAddress          = mHaddr; 
-   header.fChannelAddress       = mChannel ,
-   header.fBunchCrossingCounter = 0xBAE2;
-   header.fPayloadParity        = 0; 
-   res= header.build();
+   header.mFHammingCode          = 0x3f;
+   header.mFHeaderParity         = 0;
+   header.mFPkgType              = 4;
+   header.mFNbOf10BitWords       = mWPointer-5; 
+   header.mFChipAddress          = mHaddr; 
+   header.mFChannelAddress       = mChannel ,
+   header.mFBunchCrossingCounter = 0xBAE2;
+   header.mFPayloadParity        = 0; 
+   res= header.Build();
    mFrame[0]= (res >> 0 ) & 0x3ff;
    mFrame[1]= (res >> 10 ) & 0x3ff;
    mFrame[2]= (res >> 20 ) & 0x3ff;

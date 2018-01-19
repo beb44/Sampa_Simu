@@ -20,7 +20,7 @@ DualSampa::DualSampa(uint16_t addr1,uint16_t addr2)
   mSampas[0] = new Sampa(addr1);
   mSampas[1] = new Sampa(addr2);  
   
-  mSyncPacket       = sampa_head().build_sync();
+  mSyncPacket       = SampaHead().BuildSync();
   mSyncCountdown   = 50; // no sync packet to be sent (for the moment)
   mSendCredit      = 0; // 8192 bit to be sent per window 
                          //(10 mhz sampling rate)

@@ -10,7 +10,7 @@ Receiver::Receiver()
   mPeer = (elink *)0;
   mIsSynced = false;
   mSyncPos = 0;
-  mSyncHead = sampa_head().build_sync();
+  mSyncHead = SampaHead().BuildSync();
   mCurHead = 0;
   user_handler = 0;
   mRecHandl = 0;
@@ -22,7 +22,7 @@ Receiver::Receiver()
 Receiver::Receiver(Elink &p) : mPeer(p)
 {  
   mIsSynced = false;
-  mSynchead = sampa_head().build_sync();
+  mSynchead = SampaHead().BuildSync();
   mSyncPos = 0;
   mCurHead = 0;
   user_handler = 0;
@@ -34,7 +34,7 @@ Receiver::Receiver(Elink &p) : mPeer(p)
 
 Receiver::Receiver(int port,gbt_r &p): mPeer(p.get_elink(port)), mPort(port) 
 {
-  mSynchead = sampa_head().build_sync();
+  mSynchead = SampaHead().BuildSync();
   mSyncPos = 0;
   mCurHead = 0;
   user_handler = 0;
@@ -75,19 +75,19 @@ void Receiver::SetUserHandler(ReceiverHandler *handler)
 
 void Receiver::HandlePacket(const uint64_t header,int len,uint16_t *buffer)
 {
-sampa_head  head_decoder(header);
+SampaHead  head_decoder(header);
 
-  head_decoder.decode(); 
+  SampaHead().Decode(); 
   //head_decoder.display();
-  if (user_handler) user_handler(head_decoder.fChipAddress,
-  			         head_decoder.fChannelAddress,
+  if (user_handler) user_handler(head_decoder.mFChipAddress,
+  			         head_decoder.mFChannelAddress,
 				 0,
 				 buffer[0],
 				 buffer[1],
 				 (short *)&buffer[2]);
 				 
-  if (mRecHandl) mRecHandl->RecHandler(head_decoder.fChipAddress,
-  			         head_decoder.fChannelAddress,
+  if (mRecHandl) mRecHandl->RecHandler(head_decoder.mFChipAddress,
+  			         head_decoder.mFChannelAddress,
 				 0,
 				 buffer[0],
 				 buffer[1],
@@ -106,7 +106,7 @@ int      payload_length;
         mHeadcd --;
 	if (mHeadcd ==0) { 
 	  // header fully loaded, get playload length
-	  payload_length = sampa_head().get_nbwords(mCurHead); 
+	  payload_length = SampaHead().GetNbWords(mCurHead); 
 #ifdef STATS
           packetcount_by_type[sampa_head().get_packet_type(m_curhead)]++;
 	  packetcount++;

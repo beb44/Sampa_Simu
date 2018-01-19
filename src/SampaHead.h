@@ -22,30 +22,30 @@
 #define   CHANNEL_MASK        0x000001F000000
 #define   BUNCHCROSS_MASK     0x1FFFFE0000000
 #define   PARITY_MASK         0x2000000000000
-class sampa_head
+class SampaHead
 {
 public:
-    sampa_head();
-    sampa_head(uint64_t head);
-    uint64_t    fHammingCode;         // 6 bit long 
-    uint64_t    fHeaderParity;        // 1 bit long
-    uint64_t    fPkgType;             // 3 bit long
-    uint64_t    fNbOf10BitWords;      // 10 bit long 
-    uint64_t    fChipAddress;         // 4 bit long 
-    uint64_t    fChannelAddress;      // 5 bit long ,
-    uint64_t    fBunchCrossingCounter;// 20 bit long 
-    uint64_t    fPayloadParity;       // 1 bit long 
+    SampaHead();
+    SampaHead(uint64_t head);
+    uint64_t    mFHammingCode;         // 6 bit long 
+    uint64_t    mFHeaderParity;        // 1 bit long
+    uint64_t    mFPkgType;             // 3 bit long
+    uint64_t    mFNbOf10BitWords;      // 10 bit long 
+    uint64_t    mFChipAddress;         // 4 bit long 
+    uint64_t    mFChannelAddress;      // 5 bit long ,
+    uint64_t    mFBunchCrossingCounter;// 20 bit long 
+    uint64_t    mFPayloadParity;       // 1 bit long 
     
-    uint64_t    build();
-    void        decode();
-    void        decode(uint64_t head);
-    void        display();
+    uint64_t    Build();
+    void        Decode();
+    void        Decode(uint64_t head);
+    void        Display();
     
-    uint64_t    build_sync();
+    uint64_t    BuildSync();
     
-    uint8_t     get_packet_type(uint64_t head);
-    uint16_t    get_nbwords(uint64_t head);
+    uint8_t     GetPacketType(uint64_t head);
+    uint16_t    GetNbWords(uint64_t head);
 private:
-    uint64_t    intern_rawhead;
+    uint64_t    InternRawHead;
 };
 #endif
