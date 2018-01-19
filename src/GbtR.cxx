@@ -9,7 +9,6 @@ GbtElink::GbtElink(int port,GbtGen& gbt): mGbt(gbt), mPort(port)
 { 
   mSample = 0;
   mMutex.lock();
-//  sem_init(&mWaitSem, 0, 0);
 }
 bool GbtElink::SerialAvailable()
 {
@@ -90,5 +89,5 @@ bool gbt_r::fetch(int const port,int const sample)
 
 uint8_t gbt_r::read(int const port,int const sample)
 {
-  return mCurWord.Get(port*2+(sample & 1));
+  return mCurWord.Get(port*2+(1-(sample & 1)));
 }

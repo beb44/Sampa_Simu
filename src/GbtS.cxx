@@ -37,8 +37,8 @@ uint8_t bit2;
 	  continue;
 	}
 	bit2 = mElinkMap[i]->GetSerial();
-        mCurWord.Set(i*2,bit1 & 1);
-        mCurWord.Set(i*2+1, bit2 & 1);
+        mCurWord.Set(i*2,bit2 & 1);
+        mCurWord.Set(i*2+1, bit1 & 1);
 	active_responder++;
       }
       else {
@@ -70,8 +70,8 @@ uint8_t bit2;
       bit1 = mElinkMap[i]->GetSerial();
       if (!(mElinkMap[i]->SerialAvailable())) continue;
       bit2 = mElinkMap[i]->GetSerial();
-      mCurWord.Set(i*2,bit1 & 1);
-      mCurWord.Set(i*2+1, bit2 & 1);
+      mCurWord.Set(i*2,bit2 & 1);
+      mCurWord.Set(i*2+1, bit1 & 1);
       active_responder++;
     }
     else {

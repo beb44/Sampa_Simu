@@ -81,16 +81,16 @@ SampaHead  head_decoder(header);
   //head_decoder.display();
   if (user_handler) user_handler(head_decoder.mFChipAddress,
   			         head_decoder.mFChannelAddress,
-				 0,
 				 buffer[0],
 				 buffer[1],
+				 len,
 				 (short *)&buffer[2]);
 				 
   if (mRecHandl) mRecHandl->RecHandler(head_decoder.mFChipAddress,
   			         head_decoder.mFChannelAddress,
-				 0,
 				 buffer[0],
 				 buffer[1],
+				 len,
 				 (short *)&buffer[2]);
 				
 }
