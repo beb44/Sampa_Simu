@@ -8,7 +8,8 @@ using namespace std;
 GbtElink::GbtElink(int port,GbtGen& gbt): mGbt(gbt), mPort(port)
 { 
   mSample = 0;
-  sem_init(&mWaitSem, 0, 0);
+  mMutex.lock();
+//  sem_init(&mWaitSem, 0, 0);
 }
 bool GbtElink::SerialAvailable()
 {
@@ -24,12 +25,12 @@ uint8_t  GbtElink::GetSerial()
 
 void GbtElink::lock()
 {
-  sem_wait(&mWaitSem);
+  mMutex.lock();
 }
 
 void GbtElink::unlock()
 {
-  sem_post(&mWaitSem);
+  mMutex.unlock();
 }
 
 

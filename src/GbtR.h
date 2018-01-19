@@ -27,7 +27,7 @@ private:
   GbtGen&     mGbt;
   int         mPort;
   int         mSample;
-  sem_t	      mWaitSem;
+  std::mutex		       mMutex;
 };
 
 class gbt_r: public GbtGen
