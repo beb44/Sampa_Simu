@@ -18,7 +18,6 @@ public:
 class DualSampa  : public Elink
 {
 public:
-  DualSampa(){};       // makes constructor unavailable
   explicit DualSampa(uint16_t addr1,uint16_t addr2);
   ~DualSampa();
   void SetInternalRef(int ref);
@@ -39,6 +38,7 @@ public:
 
 private:
    
+   DualSampa(){};       // makes constructor unavailable
    Sampa             *mSampas[2];
    
    uint64_t          mSyncPacket;
