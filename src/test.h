@@ -12,8 +12,8 @@ class Test: public DualSampaHandler,ReceiverHandler
 public:
   Test(int nbthread,int nbloop);
   void start();
-  void dsp_handler(int ref);
-  void rec_handler(int addr,int ch,int nbsamp,int ts,int len, short *buff);
+  void DspHandler(int ref);
+  void RecHandler(int addr,int ch,int nbsamp,int ts,int len, short *buff);
   void display();
 //private:
   std::map<int,DualSampa *>   dsarr;

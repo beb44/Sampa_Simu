@@ -8,6 +8,7 @@
 #include "GbtS.h"
 #include "GbtR.h"
 #include "interface.h"
+#include "test.h"
 using namespace std;
 
 #define  NBT 100
@@ -63,18 +64,19 @@ void rec_handler(int addr,int ch,int nbsamp,int ts,int len, short *buff)
   //cout << "Packet recieved "<< std::dec <<addr << " " << buff[0] << endl; 
   if (buff[0] != ch)
   {
-    throw "horreur"; 
+    throw std::runtime_error("horreur"); 
   }
 }
+
 void rec_handler1(int addr,int ch,int nbsamp,int ts,int len, short *buff)
 {
- // cout << "Packet recieved ++++"<< std::dec <<addr << " " << buff[0] << endl; 
-  if (len != 2)
+  //cout << "Packet recieved ++++"<< std::dec <<addr << " " << buff[0] << endl; 
+  if (len != 4)
   {
-    throw "horreur"; 
+    throw std::runtime_error("horreur"); 
   }
 }
-int main()
+int test1()
 {
   try {
   ds.SetDataProvider(dsp_handler);
@@ -90,9 +92,28 @@ int main()
   rec.Join();
   rec1.Join();
   }
-  catch (const std::exception& e)
+  catch (const std::runtime_error& e)
   {
     cout << "execption catched" << endl;
     throw;
+  }
+  return 0;
+}
+int main()
+{
+
+  for (int i=1;i<20;i++)
+  {
+    Test  t1(i*10,5000);
+
+    t1.start();
+    t1.display();
+  }
+  for (int i=1;i<20;i++)
+  {
+    Test1  t1(i*10,5000);
+
+    t1.start();
+    t1.display();
   }
 }
