@@ -47,9 +47,9 @@ void DualSampa::SetDataProvider(void (*uh)(int))
 {
   m_c_data_provider = uh;
 }
-void DualSampa::SetDataProvider(DualSampaHandler *handler)
+void DualSampa::SetDataProvider(DualSampaHandler &handler)
 {
-  mHandlerDsp = handler;
+  mHandlerDsp = &handler;
 }
 
 void DualSampa::SelectChannel(const uint8_t sId,const uint8_t chid)
@@ -71,6 +71,7 @@ void DualSampa::SelectChannel(const uint8_t sId,const uint8_t chid)
 
 void DualSampa::ResetFrames()
 {
+
   mSampas[0]->ResetFrame();
   mSampas[1]->ResetFrame();
 }

@@ -22,7 +22,7 @@ public:
   ~DualSampa();
   void SetInternalRef(int ref);
   void SetDataProvider(void (*uh)(int));
-  void SetDataProvider(DualSampaHandler *handler);
+  void SetDataProvider(DualSampaHandler &handler);
   void SelectChannel(const uint8_t sId,const uint8_t chid);
   void ResetFrames();
   void ResetFrame(const uint8_t sId);
