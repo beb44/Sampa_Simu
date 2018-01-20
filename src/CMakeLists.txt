@@ -19,20 +19,24 @@ add_library(sampasender SHARED
         Manitou.h
         Sampa.cxx
         Sampa.h
+	SampaElink.h
         )
 target_link_libraries(sampasender PUBLIC sampabase)
 
 add_library(sampareceiver SHARED
         Elink.h
         GbtLink.h
+	GbtElink.cxx
+	GbtElink.h
         GbtR.cxx
         GbtR.h
         Receiver.cxx
         Receiver.h
+	GbtRInterface.h
         )
 target_link_libraries(sampareceiver PUBLIC sampabase Threads::Threads)
 
-add_executable(sampaTest main.cxx)
+add_executable(sampaTest main.cxx test.cxx)
 target_link_libraries(sampaTest sampasender sampareceiver)
 
 # fake target to get IDEs to take those files into account even if they
