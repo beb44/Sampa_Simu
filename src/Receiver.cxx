@@ -32,7 +32,7 @@ Receiver::Receiver(Elink &p) : mPeer(p)
 #endif
 }
 
-Receiver::Receiver(int port,gbt_r &p): mPeer(p.get_elink(port)), mPort(port) 
+Receiver::Receiver(int port,GbtR &p): mPeer(p.GetElink(port)), mPort(port) 
 {
   mSynchead = SampaHead().BuildSync();
   mSyncPos = 0;

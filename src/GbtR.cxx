@@ -1,46 +1,16 @@
 #include <iostream>
 #include <cstdint>
-#include <sys/types.h>
-#include <sys/sem.h>
 #include "GbtR.h"  
 using namespace std;
 
-GbtElink::GbtElink(int port,GbtGen& gbt): mGbt(gbt), mPort(port)
-{ 
-  mSample = 0;
-  mMutex.lock();
-}
-bool GbtElink::SerialAvailable()
-{
-bool res = mGbt.fetch(mPort,mSample);
-  return res;
-}
-
-uint8_t  GbtElink::GetSerial()
-{
-  return mGbt.read(mPort,mSample++);
-}
-
-
-void GbtElink::lock()
-{
-  mMutex.lock();
-}
-
-void GbtElink::unlock()
-{
-  mMutex.unlock();
-}
-
-
-gbt_r::gbt_r(gbtlink &provider) :mDataProvider(provider)
+GbtR::GbtR(gbtlink &provider) :mDataProvider(provider)
 {
   mElinkMap.clear();
   mStarted = false;
   mCurSample = -1;
 }
 
-Elink &gbt_r::get_elink(int const port)
+Elink &GbtR::GetElink(int const port)
 {
   if (mStarted) throw;
   if (mElinkMap.find(port) != mElinkMap.end()) throw;
@@ -50,7 +20,7 @@ Elink &gbt_r::get_elink(int const port)
   return *mElinkMap[port];
 }
 
-bool gbt_r::fetch(int const port,int const sample) 
+bool GbtR::Fetch(int const port,int const sample) 
 {
   mMutex.lock();
   if ((sample/2) == mCurSample) {
@@ -87,7 +57,7 @@ bool gbt_r::fetch(int const port,int const sample)
   }
 }
 
-uint8_t gbt_r::read(int const port,int const sample)
+uint8_t GbtR::Read(int const port,int const sample)
 {
   return mCurWord.Get(port*2+(1-(sample & 1)));
 }

@@ -2,7 +2,7 @@
 #define DUALSAMPA
 #include <cstdint>
 #include "Sampa.h"
-#include "Elink.h"
+#include "SampaElink.h"
 /*!
  *  \brief dualsampa chip emulator
  *
@@ -15,7 +15,7 @@ public:
   virtual void DspHandler(int ref) = 0;
 };
 
-class DualSampa  : public Elink
+class DualSampa  : public SampaElink
 {
 public:
   explicit DualSampa(uint16_t addr1,uint16_t addr2);

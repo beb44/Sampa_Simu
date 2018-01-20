@@ -17,7 +17,7 @@ class Receiver
 public:
   Receiver();
   Receiver(Elink &p);
-  Receiver(int port,gbt_r &p);
+  Receiver(int port,GbtR &p);
   void SetUserHandler(void (*foo)(int,int,int,int,int,short *));
   void SetUserHandler(ReceiverHandler* handler);
   void Start();

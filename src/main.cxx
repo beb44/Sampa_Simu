@@ -16,7 +16,7 @@ using namespace std;
 Sampa sampa_0(0);
 DualSampa ds(10,12);
 GbtS     gbt_s1;
-gbt_r    gbt_r1(gbt_s1);
+GbtR     gbt_r1(gbt_s1);
 Receiver rec(0,gbt_r1);
 DualSampa ds1(22,24);
 Receiver rec1(1,gbt_r1);

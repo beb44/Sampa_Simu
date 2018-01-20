@@ -4,39 +4,19 @@
 #include <map>
 #include <mutex>
 #include <condition_variable>
-#include <sys/types.h>
-#include <semaphore.h>
+#include "GbtRInterface.h"
 #include "Bits128.h"
 #include "Elink.h"
+#include "GbtElink.h"
 #include "GbtLink.h"
-class GbtGen
-{
-public:
-   virtual bool    fetch(int port,int sample)=0;
-   virtual uint8_t read(int port,int sample)=0;
-};
-class GbtElink : public Elink
-{
-public:
-  GbtElink(int port,GbtGen& gbt);
-  bool SerialAvailable(); 
-  uint8_t GetSerial(); 
-  void  lock();
-  void  unlock();
-private:
-  GbtGen&     mGbt;
-  int         mPort;
-  int         mSample;
-  std::mutex		       mMutex;
-};
 
-class gbt_r: public GbtGen
+class GbtR: public GbtRInterface
 {
 public:
-  gbt_r(gbtlink &provider);
-  Elink   &get_elink(int const port);
-  bool    fetch(int const port,int const sample) ;
-  uint8_t read(int const port,int const sample);
+  GbtR(gbtlink &provider);
+  Elink   &GetElink(int const port);
+  bool    Fetch(int const port,int const sample) ;
+  uint8_t Read(int const port,int const sample);
 private:
   bool                         mStarted;
   gbtlink                      &mDataProvider;

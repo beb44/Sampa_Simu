@@ -2,14 +2,14 @@
 #define SAMPA
 #include <cstdint>
 #include <list>
-#include "Elink.h"
+#include "SampaElink.h"
 /*!
  *  \brief sampa chip emulator
  *
  *  This class provides a emulation artefacts for sampa chip serialisation mechanism.\n
  *  it prodives methods to build dsp generated build frames and methods to emulate serial link.
  */
-class Sampa  : public Elink
+class Sampa  : public SampaElink
 {
 public:
   explicit Sampa(uint16_t addr); 
