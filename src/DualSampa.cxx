@@ -39,14 +39,44 @@ DualSampa::~DualSampa()
   delete mSampas[0];
   delete mSampas[1];
 }
+/*!
+ *  \brief sets an internal ref
+ *
+ *  assign to the DualSampa an user reference . \n
+ *  This reference will be passed in callback routines or method.
+ *  
+ *  \param ref user reference
+ */
+
 void DualSampa::SetInternalRef(int ref)
 {
   mInternalRef= ref;
 }
+
+/*!
+ *  \brief sets a dataprovider
+ *
+ *  Sets a callback routine to be call each time a time window ends. \n
+ *  The routine is in charge to provide the new data.
+ *  
+ *  \param uh address of the dataproviding routine (pure C interface)
+ */
+
 void DualSampa::SetDataProvider(void (*uh)(int))
 {
   m_c_data_provider = uh;
 }
+
+/*!
+ *  \brief sets a dataprovider
+ *
+ *  Sets a class implementing DualSampaHandler) to be called
+ *  each time a time window ends. \n
+ *  The routine is in charge to provide the new data.
+ *  
+ *  \param handler reference of the data providing class
+ */
+
 void DualSampa::SetDataProvider(DualSampaHandler &handler)
 {
   mHandlerDsp = &handler;
