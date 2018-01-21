@@ -11,12 +11,20 @@ using namespace std;
  *
  *  \param addr : hardware address of the sampa chip
  */
-Sampa::Sampa(uint16_t addr) : mHaddr(addr)
+Sampa::Sampa(uint16_t addr) : mHaddr(addr),
+                              mChannel(0),
+			      mWPointer(0),
+			      mHasHeader(false),
+			      mDataAvailable(false),
+			      mCurSendFrame(NULL),
+			      mCurWord(0),
+			      mCurBit(0),
+			      mCurLen(0)
 {
   ResetFrame();  // make room for header
-  mChannel = 0;    // channel 0 is default
-  mDataAvailable = false;        // no serial data available;
-  mCurSendFrame = (uint16_t *)0; // no current frame being sent
+//  mChannel = 0;    // channel 0 is default
+//  mDataAvailable = false;        // no serial data available;
+//  mCurSendFrame = (uint16_t *)0; // no current frame being sent
 }
 
 Sampa::~Sampa()
