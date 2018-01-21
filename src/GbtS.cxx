@@ -2,14 +2,23 @@
 #include "GbtS.h"
 #include "Bits128.h"
 using namespace std;
-GbtS::GbtS() 
+/*!
+ * \brief constructor
+ */
+GbtS::GbtS() : mNbRec(0)
 {
 
   mSendList.clear();
   // reset elink map
-  for (int i=0;i<mMaxSocket;i++) mElinkMap[i] = 0;
-  mNbRec =0;
+  for (int i=0;i<mMaxSocket;i++) mElinkMap[i] = NULL;
 }
+
+/*!
+ * \brief connect an Elink of a free port
+ *
+ * \params socket socket number from 0 to mMaxSocket-1 (0-39)
+ * \params adress of the Elink interface
+ */
 
 void GbtS::PlugElink(const uint8_t socket,Elink *peer)
 {
@@ -18,11 +27,22 @@ void GbtS::PlugElink(const uint8_t socket,Elink *peer)
   mNbRec +=1;
 }
 
+/*!
+ * \brief main processing methods
+ *
+ * collects on each connected Sampa/Dualsampa a new bit.\n
+ * if no bit is available on a given Sampa/Dualsampa, 0 value is used.\n
+ * if no bit is available on ALL Sampa/Dualsampa, the processing ends.
+ * All collected bits are gathered into one GbtWord and push in the
+ * transmission queue.
+ */
+
 void GbtS::Process()
 {
 int     active_responder;
 uint8_t bit1;
 uint8_t bit2;
+Bits128 mCurWord;
 
   while (active_responder != 0) {
     // reset nb responder
@@ -55,11 +75,24 @@ uint8_t bit2;
   } // end while (active....
 }
 
+/*!
+ * \brief Check is something is present on Elinks
+ *
+ * collects on each connected Sampa/Dualsampa a new bit.\n
+ * if no bit is available on a given Sampa/Dualsampa, 0 value is used.\n
+ * if no bit is available on ALL Sampa/Dualsampa, the processing ends.
+ * All collected bits are gathered into one GbtWord and push in the
+ * transmission queue.
+ *
+ * \return True is some data is available
+ */
+
 bool GbtS::GbtWordAvailable()
 {
 int     active_responder = 0;
 uint8_t bit1;
 uint8_t bit2;
+Bits128 mCurWord;
 
   for (int i=0;i<mMaxSocket;i++) {
     if (mElinkMap[i] != 0) {
@@ -87,6 +120,16 @@ uint8_t bit2;
   }
   return (active_responder == mNbRec);
 }
+
+/*!
+ * \brief Returns the first GbtWord in the sending queue (and remove it fromm
+ *        the queue)
+ *
+ * If not GbtWord is present , the 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF word
+ * is returned.
+ *
+ * \return Next GbtWord if present, -1 otherwise
+ */
 
 Bits128 GbtS::GetWord()
 {
