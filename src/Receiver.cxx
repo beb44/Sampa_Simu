@@ -19,7 +19,13 @@ Receiver::Receiver()
 #endif
 }
 #endif
-Receiver::Receiver(Elink &p) : mPeer(p)
+/*!
+ *  \brief Constructor
+ *
+ *  \param provider : reference of the 'remote' Elink
+ */
+
+Receiver::Receiver(Elink &provider) : mPeer(provider)
 {  
   mIsSynced = false;
   mSynchead = SampaHead().BuildSync();
@@ -27,22 +33,27 @@ Receiver::Receiver(Elink &p) : mPeer(p)
   mCurHead = 0;
   user_handler = 0;
   mRecHandl = 0;
-#ifdef STATS
-  reset_stats();
-#endif
 }
+/*!
+ *  \brief Constructeur
+ *
+ *  \param port : port on which the remote Sampa/DualSampa is connected
+ *  \param provider : reference of the 'remote' Gbtr
+ */
 
-Receiver::Receiver(int port,GbtR &p): mPeer(p.GetElink(port)), mPort(port) 
+Receiver::Receiver(int port,GbtR &provider): mPeer(provider.GetElink(port)), mPort(port) 
 {
   mSynchead = SampaHead().BuildSync();
   mSyncPos = 0;
   mCurHead = 0;
   user_handler = 0;
   mRecHandl = 0;
-#ifdef STATS
-  reset_stats();
-#endif
 }
+
+/*!
+ *  \brief Start the receiver processing loop in a thread
+ *
+ */
 
 void Receiver::Start()
 {
@@ -55,10 +66,19 @@ void Receiver::Start()
   }
 }
 
+/*!
+ *  \brief Waits for the receiver processing loop to terminate
+ *
+ */
 void Receiver::Join()
 {
   TheThread->join();
 }
+
+/*!
+ *  \brief Check the thread still exist
+ *
+ */
 bool Receiver::Joinable()
 {
   return TheThread->joinable();
@@ -73,6 +93,13 @@ void Receiver::SetUserHandler(ReceiverHandler *handler)
   mRecHandl=handler;
 }
 
+/*!
+ *  \brief Handle and dispatch incomming packets
+ *
+ *  \params header packet header in a 50 bit width format
+ *  \params len payload length (number of 10 bit words )
+ *  \params buffer payload 
+ */
 void Receiver::HandlePacket(const uint64_t header,int len,uint16_t *buffer)
 {
 SampaHead  head_decoder(header);
@@ -94,9 +121,19 @@ SampaHead  head_decoder(header);
 				 (short *)&buffer[2]);
 				
 }
+/*!
+ *  \brief main processing loop
+ *
+ * reads the remote party serial link, search for synchronisation and
+ * parse incoming packets.\n
+ * the processing ends when no more data is available on the serial link.
+ *
+ */
+
 void Receiver::Process()
 {  
-int      payload_length;
+int      payloadLength;
+int      packetType;
 
 //  if (mPeer == (elink *)0) return;
   while (mPeer.SerialAvailable()) {
@@ -106,12 +143,12 @@ int      payload_length;
         mHeadcd --;
 	if (mHeadcd ==0) { 
 	  // header fully loaded, get playload length
-	  payload_length = SampaHead().GetNbWords(mCurHead); 
-#ifdef STATS
-          packetcount_by_type[sampa_head().get_packet_type(m_curhead)]++;
-	  packetcount++;
-#endif	
-	  if (payload_length == 0) {
+	  payloadLength = SampaHead().GetNbWords(mCurHead);
+	  packetType    = SampaHead().GetPacketType(mCurHead);
+          mStats.mPacketCountByType[packetType]++;
+          mStats.mWordsCountByPacketType[packetType] += payloadLength+5;
+	  mStats.mPacketCount++;
+	  if (payloadLength == 0) {
 	    // zero length packet, catch next header
 	    mHeadcd = 50; // 50 bit of header to be read
 	  }
@@ -133,9 +170,9 @@ int      payload_length;
           *mWPointer = 0;
           mCurBit = 0;
 	  mCurLen++;
-	  if (mCurLen == payload_length)  {
+	  if (mCurLen == payloadLength)  {
 	     mHeadcd = 50; // 50 bit of header to be read
-	     HandlePacket(mCurHead,payload_length,mFrame);
+	     HandlePacket(mCurHead,payloadLength,mFrame);
 	   }
          }
        }  
@@ -147,29 +184,50 @@ int      payload_length;
 	//m_curhead << "payload length " << payload_length << endl;
         mIsSynced= true;
 	mHeadcd = 50; // 50 bit of header to be read
-#ifdef STATS
-        packetcount_by_type[sampa_head().get_packet_type(m_curhead)]++;
-	packetcount++;
-#endif	
+	payloadLength = SampaHead().GetNbWords(mCurHead);
+	packetType    = SampaHead().GetPacketType(mCurHead);
+        mStats.mPacketCountByType[packetType]++;
+        mStats.mWordsCountByPacketType[packetType] += payloadLength+5;
+	mStats.mPacketCount++;
       }	
     }
   }  
 }
 
-#ifdef STATS
 // statistic handling
+/*!
+ *  \brief Constructor
+ *
+ */ 
+Receiver::Stats::Stats() :mPacketCount(0)
+    {
+      for (int i=0;i<8;i++) mPacketCountByType[i]= 0;
+      for (int i=0;i<8;i++) mWordsCountByPacketType[i]= 0;
+    }
 
-void Receiver::reset_stats()
+/*!
+ *  \brief Reset stats counters
+ *
+ */ 
+
+void Receiver::Stats::ResetStats()
 {
-  packetcount = 0;
-  for (int i=0;i<8;i++) packetcount_by_type[i]=0;
+  mPacketCount = 0;
+  for (int i=0;i<8;i++) mPacketCountByType[i]= 0;
+  for (int i=0;i<8;i++) mWordsCountByPacketType[i]= 0;
 }
-void receiver::display_stats()
+
+/*!
+ *  \brief Display stats counters
+ *
+ */ 
+
+void Receiver::Stats::DisplayStats()
 {
   cout << "Received packets statistics" << endl;
-  cout << "Total received packets : " << packetcount<< endl;
+  cout << "Total received packets : " << mPacketCount<< endl;
   for (int i=0;i<8;i++) {
-    cout <<  "Received packets type "<<i<< " : " << packetcount_by_type[i]<< endl; packetcount_by_type[i]=0;
+    cout <<  "Received packets type "<<i<< " : " << mPacketCountByType[i]<< endl;
   }
 }
-#endif
+
