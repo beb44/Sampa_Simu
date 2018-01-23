@@ -1,10 +1,16 @@
 #ifndef RECEIVER
 #define RECEIVER
+#include <cstdint>
 #include <thread>
 #include "SampaHead.h"
 #include "Elink.h"
 #include "GbtR.h"
 
+typedef void (ClusterSumPacketHandler)(void *ui,int addr,int ch,int nbsamp,int ts,int val);
+typedef void (PacketHandler)(void *ui,int addr,int ch,int nbsamp,int ts,short *buff);
+typedef void (RawPacketHandler)(void *ui,int addr,int ch,int len,short *buff);
+typedef void (StartOfPackerHandler)(void *ui,uint64_t header);
+typedef void (EndOfPackerHandler)(void *ui);
 class ReceiverHandler
 {
 public:
@@ -40,17 +46,39 @@ class Receiver
 public:
   Receiver();
   Receiver(Elink &provider);
+  Receiver(Elink &provider,void *ui,
+                           StartOfPackerHandler *sop,
+                           PacketHandler *ph,
+			   EndOfPackerHandler *eop);
+  Receiver(Elink &provider,void *ui,
+                           StartOfPackerHandler *sop,
+                           ClusterSumPacketHandler *ph,
+			   EndOfPackerHandler *eop);
+  Receiver(Elink &provider,void *ui,
+                           StartOfPackerHandler *sop,
+                           RawPacketHandler *ph,
+			   EndOfPackerHandler *eop);
   Receiver(int port,GbtR &provider);
+  Receiver(int port,GbtR &provider,void *ui,
+                                   StartOfPackerHandler *sop,
+                                   PacketHandler *ph,
+			           EndOfPackerHandler *eop);
+  Receiver(int port,GbtR &provider,void *ui,
+                                   StartOfPackerHandler *sop,
+                                   ClusterSumPacketHandler *ph,
+			           EndOfPackerHandler *eop);
+  Receiver(int port,GbtR &provider,void *ui,
+                                   StartOfPackerHandler *sop,
+                                   RawPacketHandler *ph,
+			           EndOfPackerHandler *eop);
   void SetUserHandler(void (*foo)(int,int,int,int,int,short *));
   void SetUserHandler(ReceiverHandler* handler);
   void Start();
   void Join();
   bool Joinable();
   void Process();
-#ifdef STATS
   void DisplayStats();
   void ResetStats();
-#endif
 private:
   /*! \brief remote party                                            */
   Elink     &mPeer;
@@ -65,6 +93,7 @@ private:
 
 
   /*! \brief Internal packet handling routine                        */
+  /*! \brief Cluster sum packet user handler (zero supressed)        */
   void HandlePacket(const uint64_t header,int len,uint16_t *buffer);
   
   /*! \brief synch packet found (stream in sync)                     */
@@ -89,7 +118,18 @@ private:
   /*! \brief statistic collection record                             */
   Stats     mStats;
   void (*user_handler)(int,int,int,int,int,short *);
-  ReceiverHandler     *mRecHandl;
-
+  ReceiverHandler         *mRecHandl;
+  /*! \brief User provided identifier                                */
+  void                    *mUi;
+  /*! \brief Begin of packet user handler                            */
+  StartOfPackerHandler    *mStartOfPackerHandler;
+  /*! \brief Normal packet user handler (zero supressed)             */
+  PacketHandler           *mPacketHandler;
+  /*! \brief Cluster sum packet user handler (zero supressed)        */
+  ClusterSumPacketHandler *mClusterSumPacketHandler;
+  /*! \brief Raw packet (non zero suppressed user handler)           */
+  RawPacketHandler        *mPacketRawHandler;
+  /*! \brief End of packet user handler                              */
+  EndOfPackerHandler      *mEndOfPackerHandler;
 };
 #endif

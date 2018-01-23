@@ -6,6 +6,12 @@
 #include <thread>
 
 using namespace std;
+void RecHandler1(void * ui,int addr,int ch,int nbsamp,int ts, short *buff)
+{
+ ((Test *)ui)->RecHandler(addr,ch,nbsamp,ts, buff);
+}
+
+
 Test::Test(int nbthread,int nbloop)
 {
   dsarr.clear();
@@ -23,8 +29,8 @@ void Test::start()
     dsarr[i]= new DualSampa(i*2,i*2+1);
     dsarr[i]->SetInternalRef(i);
     dsarr[i]->SetDataProvider(static_cast<DualSampaHandler&>( *this));
-    recarr[i] = new Receiver(*dsarr[i]);
-    recarr[i]->SetUserHandler(this);
+    recarr[i] = new Receiver(*dsarr[i],(void *)this,NULL,RecHandler1,NULL);
+    //recarr[i]->SetUserHandler(this);
   }
   //recarr[0]->display_stats();
 
@@ -46,7 +52,7 @@ void Test::DspHandler(int ref)
 
   dsarr[ref]->RegenerateData();
 }
-void Test::RecHandler(int addr,int ch,int nbsamp,int ts,int len, short *buff)
+void Test::RecHandler(int addr,int ch,int nbsamp,int ts, short *buff)
 {
 }
 

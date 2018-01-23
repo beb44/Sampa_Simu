@@ -24,16 +24,126 @@ Receiver::Receiver()
  *
  *  \param provider : reference of the 'remote' Elink
  */
+Receiver::Receiver(Elink &provider) : mPeer(provider),
+                                      mPort(0),
+				      mSynchead(SampaHead().BuildSync()),
+				      mCurHead(0),
+                                      mIsSynced(false),
+				      mSyncPos(0),
+				      mUi(NULL),
+		                      mStartOfPackerHandler(NULL),
+		                      mPacketHandler(NULL),
+		                      mClusterSumPacketHandler(NULL),
+		                      mPacketRawHandler(NULL),
+		                      mEndOfPackerHandler(NULL)
 
-Receiver::Receiver(Elink &provider) : mPeer(provider)
 {  
-  mIsSynced = false;
-  mSynchead = SampaHead().BuildSync();
-  mSyncPos = 0;
-  mCurHead = 0;
   user_handler = 0;
   mRecHandl = 0;
 }
+/*!
+ *  \brief Constructor
+ *
+ *  The receiver is configured in normal zero supressed mode packets 
+ *  (i.e. the remote Sampa/DualSampa is assumed to be configured
+ *  accordingly)
+ *
+ *  \param provider  Reference of the 'remote' Elink
+ *  \param ui        User provided reférence
+ *  \param sop       Start Of Packet user handler
+ *  \param ph        Packet user handler
+ *  \param eop       Etart Of Packet user handler
+ */
+
+Receiver::Receiver(Elink &provider,void *ui,
+                                   StartOfPackerHandler *sop,
+                                   PacketHandler *ph,
+			           EndOfPackerHandler *eop) 
+                                    : mPeer(provider),
+                                      mPort(0),
+				      mSynchead(SampaHead().BuildSync()),
+				      mCurHead(0),
+                                      mIsSynced(false),
+				      mSyncPos(0),
+				      mUi(ui),
+		                      mStartOfPackerHandler(sop),
+		                      mPacketHandler(ph),
+		                      mClusterSumPacketHandler(NULL),
+		                      mPacketRawHandler(NULL),
+		                      mEndOfPackerHandler(eop)
+{  
+  user_handler = 0;
+  mRecHandl = 0;
+}
+/*!
+ *  \brief Constructor
+ *
+ *  The receiver is configured in Cluster sum zero supressed mode packets 
+ *  (i.e. the remote Sampa/DualSampa is assumed to be configured
+ *  accordingly)
+ *
+ *  \param provider  Reference of the 'remote' Elink
+ *  \param ui        User provided reférence
+ *  \param sop       Start Of Packet user handler
+ *  \param ph        Packet user handler
+ *  \param eop       Etart Of Packet user handler
+ */
+
+Receiver::Receiver(Elink &provider,void *ui,
+                                   StartOfPackerHandler *sop,
+                                   ClusterSumPacketHandler *ph,
+			           EndOfPackerHandler *eop) 
+                                    : mPeer(provider),
+                                      mPort(0),
+				      mSynchead(SampaHead().BuildSync()),
+				      mCurHead(0),
+                                      mIsSynced(false),
+				      mSyncPos(0),
+				      mUi(ui),
+		                      mStartOfPackerHandler(sop),
+		                      mPacketHandler(NULL),
+		                      mClusterSumPacketHandler(ph),
+		                      mPacketRawHandler(NULL),
+		                      mEndOfPackerHandler(eop)
+{  
+  user_handler = 0;
+  mRecHandl = 0;
+}
+/*!
+ *  \brief Constructor
+ *
+ *  The receiver is configured in non zero supressed mode packets 
+ *  (i.e. the remote Sampa/DualSampa is assumed to be configured
+ *  accordingly)
+ *
+ *  \param provider  Reference of the 'remote' Elink
+ *  \param ui        User provided reférence
+ *  \param sop       Start Of Packet user handler
+ *  \param ph        Packet user handler
+ *  \param eop       Etart Of Packet user handler
+ */
+
+Receiver::Receiver(Elink &provider, void *ui,
+                                   StartOfPackerHandler *sop,
+                                   RawPacketHandler *ph,
+			           EndOfPackerHandler *eop) 
+                                    : mPeer(provider),
+                                      mPort(0),
+				      mSynchead(SampaHead().BuildSync()),
+				      mCurHead(0),
+                                      mIsSynced(false),
+				      mSyncPos(0),
+				      mUi(ui),
+		                      mStartOfPackerHandler(sop),
+		                      mPacketHandler(NULL),
+		                      mClusterSumPacketHandler(NULL),
+		                      mPacketRawHandler(ph),
+		                      mEndOfPackerHandler(eop)
+{  
+  user_handler = 0;
+  mRecHandl = 0;
+}
+
 /*!
  *  \brief Constructeur
  *
@@ -41,11 +151,125 @@ Receiver::Receiver(Elink &provider) : mPeer(provider)
  *  \param provider : reference of the 'remote' Gbtr
  */
 
-Receiver::Receiver(int port,GbtR &provider): mPeer(provider.GetElink(port)), mPort(port) 
+Receiver::Receiver(int port,GbtR &provider): 
+                                      mPeer(provider.GetElink(port)), 
+				      mPort(port), 
+				      mSynchead(SampaHead().BuildSync()),
+				      mCurHead(0),
+                                      mIsSynced(false),
+				      mSyncPos(0),
+				      mUi(NULL),
+		                      mStartOfPackerHandler(NULL),
+		                      mPacketHandler(NULL),
+		                      mClusterSumPacketHandler(NULL),
+		                      mPacketRawHandler(NULL),
+		                      mEndOfPackerHandler(NULL)
 {
-  mSynchead = SampaHead().BuildSync();
-  mSyncPos = 0;
-  mCurHead = 0;
+  user_handler = 0;
+  mRecHandl = 0;
+}
+/*!
+ *  \brief Constructor
+ *
+ *  The receiver is configured in normal zero supressed mode packets 
+ *  (i.e. the remote Sampa/DualSampa is assumed to be configured
+ *  accordingly)
+ *
+ *  \param port      Port on which the remote Sampa/DualSampa is connected
+ *  \param provider  Reference of the 'remote' Elink
+ *  \param ui        User provided reférence
+ *  \param sop       Start Of Packet user handler
+ *  \param ph        Packet user handler
+ *  \param eop       Etart Of Packet user handler
+ */
+
+Receiver::Receiver(int port,GbtR &provider,void *ui,
+                                           StartOfPackerHandler *sop,
+                                           PacketHandler        *ph,
+			                   EndOfPackerHandler   *eop): 
+                                      mPeer(provider.GetElink(port)), 
+				      mPort(port), 
+				      mSynchead(SampaHead().BuildSync()),
+				      mCurHead(0),
+                                      mIsSynced(false),
+				      mSyncPos(0),
+				      mUi(ui),
+		                      mStartOfPackerHandler(NULL),
+		                      mPacketHandler(ph),
+		                      mClusterSumPacketHandler(NULL),
+		                      mPacketRawHandler(NULL),
+		                      mEndOfPackerHandler(NULL)
+{
+  user_handler = 0;
+  mRecHandl = 0;
+}
+/*!
+ *  \brief Constructor
+ *
+ *  The receiver is configured in Cluster sum zero supressed mode packets 
+ *  (i.e. the remote Sampa/DualSampa is assumed to be configured
+ *  accordingly)
+ *
+ *  \param port      Port on which the remote Sampa/DualSampa is connected
+ *  \param provider  Reference of the 'remote' Elink
+ *  \param ui        User provided reférence
+ *  \param sop       Start Of Packet user handler
+ *  \param ph        Packet user handler
+ *  \param eop       Etart Of Packet user handler
+ */
+
+Receiver::Receiver(int port,GbtR &provider,void *ui,
+                                           StartOfPackerHandler     *sop,
+                                           ClusterSumPacketHandler *ph,
+			                   EndOfPackerHandler       *eop): 
+                                      mPeer(provider.GetElink(port)), 
+				      mPort(port), 
+				      mSynchead(SampaHead().BuildSync()),
+				      mCurHead(0),
+                                      mIsSynced(false),
+				      mSyncPos(0),
+				      mUi(ui),
+		                      mStartOfPackerHandler(NULL),
+		                      mPacketHandler(NULL),
+		                      mClusterSumPacketHandler(ph),
+		                      mPacketRawHandler(NULL),
+		                      mEndOfPackerHandler(NULL)
+{
+  user_handler = 0;
+  mRecHandl = 0;
+}
+/*!
+ *  \brief Constructor
+ *
+ *  The receiver is configured in non zero supressed mode packets 
+ *  (i.e. the remote Sampa/DualSampa is assumed to be configured
+ *  accordingly)
+ *
+ *  \param port      Port on which the remote Sampa/DualSampa is connected
+ *  \param provider  Reference of the 'remote' Elink
+ *  \param ui        User provided reférence
+ *  \param sop       Start Of Packet user handler
+ *  \param ph        Packet user handler
+ *  \param eop       Etart Of Packet user handler
+ */
+
+Receiver::Receiver(int port,GbtR &provider,void *ui,
+                                           StartOfPackerHandler *sop,
+                                           RawPacketHandler     *ph,
+			                   EndOfPackerHandler   *eop): 
+                                      mPeer(provider.GetElink(port)), 
+				      mPort(port), 
+				      mSynchead(SampaHead().BuildSync()),
+				      mCurHead(0),
+                                      mIsSynced(false),
+				      mSyncPos(0),
+				      mUi(ui),
+		                      mStartOfPackerHandler(NULL),
+		                      mPacketHandler(NULL),
+		                      mClusterSumPacketHandler(NULL),
+		                      mPacketRawHandler(ph),
+		                      mEndOfPackerHandler(NULL)
+{
   user_handler = 0;
   mRecHandl = 0;
 }
@@ -106,6 +330,47 @@ SampaHead  head_decoder(header);
 
   head_decoder.Decode(); 
   //head_decoder.display();
+  if (mStartOfPackerHandler) mStartOfPackerHandler(mUi,header);
+  if (mPacketHandler)
+  {
+    // parse packet
+    int curpos = 0;
+    int len;
+    while (curpos < len)
+    {
+       len = buffer[curpos]+2;
+       mPacketHandler(mUi,
+                      head_decoder.mFChipAddress,
+  		      head_decoder.mFChannelAddress,
+		      buffer[curpos],
+		      buffer[curpos+1],
+		     (short *)&buffer[curpos+2]);
+       curpos += len;
+    }
+  }
+  if (mClusterSumPacketHandler)
+  {
+    // parse packet
+    int curpos = 0;
+    while (curpos < len)
+    {
+       mClusterSumPacketHandler(mUi,
+                                head_decoder.mFChipAddress,
+  		                head_decoder.mFChannelAddress,
+		                buffer[curpos],
+		                buffer[curpos+1],
+		                buffer[curpos+2]*1024+buffer[curpos+3]); 
+       curpos += 4;
+    }
+  }
+  if (mPacketRawHandler)
+  {
+    mPacketRawHandler(mUi,
+                      head_decoder.mFChipAddress,
+  		      head_decoder.mFChannelAddress,
+		      len,
+		     (short *)&buffer[2]);
+  }  
   if (user_handler) user_handler(head_decoder.mFChipAddress,
   			         head_decoder.mFChannelAddress,
 				 buffer[0],
@@ -120,6 +385,8 @@ SampaHead  head_decoder(header);
 				 len,
 				 (short *)&buffer[2]);
 				
+  if (mEndOfPackerHandler) mEndOfPackerHandler(mUi);
+
 }
 /*!
  *  \brief main processing loop

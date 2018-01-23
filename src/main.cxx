@@ -76,6 +76,11 @@ void rec_handler1(int addr,int ch,int nbsamp,int ts,int len, short *buff)
     throw std::runtime_error("horreur"); 
   }
 }
+
+void toto (void *ui,int addr,int ch,int nbsamp,int ts,int val)
+{
+return;
+}
 int test1()
 {
   try {
@@ -99,6 +104,12 @@ int test1()
   }
   return 0;
 }
+
+void t2 (void *ui,int addr,int ch,int nbsamp,int ts,short *buff)
+{
+}
+Receiver rec11(ds1,NULL,NULL,toto,NULL);
+
 int main()
 {
 
