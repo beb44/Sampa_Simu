@@ -41,6 +41,7 @@ Receiver::Receiver(Elink &provider) : mPeer(provider),
   user_handler = 0;
   mRecHandl = 0;
 }
+
 /*!
  *  \brief Constructor
  *
@@ -49,12 +50,11 @@ Receiver::Receiver(Elink &provider) : mPeer(provider),
  *  accordingly)
  *
  *  \param provider  Reference of the 'remote' Elink
- *  \param ui        User provided reférence
+ *  \param ui        User provided reference
  *  \param sop       Start Of Packet user handler
  *  \param ph        Packet user handler
  *  \param eop       Etart Of Packet user handler
  */
-
 Receiver::Receiver(Elink &provider,void *ui,
                                    StartOfPackerHandler *sop,
                                    PacketHandler *ph,
@@ -75,6 +75,7 @@ Receiver::Receiver(Elink &provider,void *ui,
   user_handler = 0;
   mRecHandl = 0;
 }
+
 /*!
  *  \brief Constructor
  *
@@ -88,7 +89,6 @@ Receiver::Receiver(Elink &provider,void *ui,
  *  \param ph        Packet user handler
  *  \param eop       Etart Of Packet user handler
  */
-
 Receiver::Receiver(Elink &provider,void *ui,
                                    StartOfPackerHandler *sop,
                                    ClusterSumPacketHandler *ph,
@@ -109,6 +109,7 @@ Receiver::Receiver(Elink &provider,void *ui,
   user_handler = 0;
   mRecHandl = 0;
 }
+
 /*!
  *  \brief Constructor
  *
@@ -122,7 +123,6 @@ Receiver::Receiver(Elink &provider,void *ui,
  *  \param ph        Packet user handler
  *  \param eop       Etart Of Packet user handler
  */
-
 Receiver::Receiver(Elink &provider, void *ui,
                                    StartOfPackerHandler *sop,
                                    RawPacketHandler *ph,
@@ -150,7 +150,6 @@ Receiver::Receiver(Elink &provider, void *ui,
  *  \param port : port on which the remote Sampa/DualSampa is connected
  *  \param provider : reference of the 'remote' Gbtr
  */
-
 Receiver::Receiver(int port,GbtR &provider): 
                                       mPeer(provider.GetElink(port)), 
 				      mPort(port), 
@@ -168,6 +167,7 @@ Receiver::Receiver(int port,GbtR &provider):
   user_handler = 0;
   mRecHandl = 0;
 }
+
 /*!
  *  \brief Constructor
  *
@@ -182,7 +182,6 @@ Receiver::Receiver(int port,GbtR &provider):
  *  \param ph        Packet user handler
  *  \param eop       Etart Of Packet user handler
  */
-
 Receiver::Receiver(int port,GbtR &provider,void *ui,
                                            StartOfPackerHandler *sop,
                                            PacketHandler        *ph,
@@ -203,6 +202,7 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
   user_handler = 0;
   mRecHandl = 0;
 }
+
 /*!
  *  \brief Constructor
  *
@@ -217,7 +217,6 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
  *  \param ph        Packet user handler
  *  \param eop       Etart Of Packet user handler
  */
-
 Receiver::Receiver(int port,GbtR &provider,void *ui,
                                            StartOfPackerHandler     *sop,
                                            ClusterSumPacketHandler *ph,
@@ -320,9 +319,9 @@ void Receiver::SetUserHandler(ReceiverHandler *handler)
 /*!
  *  \brief Handle and dispatch incomming packets
  *
- *  \params header packet header in a 50 bit width format
- *  \params len payload length (number of 10 bit words )
- *  \params buffer payload 
+ *  \param header packet header in a 50 bit width format
+ *  \param len payload length (number of 10 bit words )
+ *  \param buffer payload 
  */
 void Receiver::HandlePacket(const uint64_t header,int len,uint16_t *buffer)
 {

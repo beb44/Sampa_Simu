@@ -5,7 +5,7 @@
 #include "GbtRInterface.h"
 #include "Elink.h"
 /*!
- * \brief 'Virtual" Elink interface between GbtR and Receiver
+ * \brief 'Virtual' Elink interface between GbtR and Receiver
  */
 class GbtElink : public Elink
 {

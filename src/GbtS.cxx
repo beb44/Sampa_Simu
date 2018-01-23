@@ -16,8 +16,8 @@ GbtS::GbtS() : mNbRec(0)
 /*!
  * \brief connect an Elink of a free port
  *
- * \params socket socket number from 0 to mMaxSocket-1 (0-39)
- * \params adress of the Elink interface
+ * \param socket socket number from 0 to mMaxSocket-1 (0-39)
+ * \param peer of the Elink interface
  */
 
 void GbtS::PlugElink(const uint8_t socket,Elink *peer)

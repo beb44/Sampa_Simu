@@ -1,5 +1,5 @@
 /*!
- * \file interface;h
+ * \file interface.h
  * \brief provides C like interfaces
  */
 #include <iostream>
@@ -11,7 +11,6 @@
 #include "Manitou.h"
 
 /*!
- *  \function create_dualsampa
  *  \brief External method to create dualsampa object
  *
  *  \param ad1  hardware address of the first sampa chip
@@ -24,7 +23,6 @@ extern "C" int create_dualsampa(int ad1,int ad2)
   return Manitou::GetInstance()->CreateDualSampa(ad1,ad2); 
 }
 /*!
- *  \function delete_dualsampa
  *  \brief External method to delete dualsampa object
  *
  *  \param id  dualsampa object reference

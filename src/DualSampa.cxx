@@ -96,7 +96,6 @@ void DualSampa::SelectChannel(const uint8_t sId,const uint8_t chid)
  *  the frame header will be automatically build when frame will be 'sent out'.\n
  *  If the previous frame has not been sent, it will be lost
  *  
- *  \param 
  */
 
 void DualSampa::ResetFrames()

@@ -10,10 +10,10 @@ Bits128::Bits128()
 /*!
  * \brief 128 bit constructor with initial value
  *
- * \params m3 Most significant 32 bits
- * \params m2 next significant 32 bits
- * \params m1 next significant 32 bits
- * \params m0 less significant 32 bits
+ * \param m3 Most significant 32 bits
+ * \param m2 next significant 32 bits
+ * \param m1 next significant 32 bits
+ * \param m0 less significant 32 bits
  *
  */
 Bits128::Bits128(uint32_t m3,uint32_t m2,uint32_t m1,uint32_t m0)
@@ -26,7 +26,7 @@ Bits128::Bits128(uint32_t m3,uint32_t m2,uint32_t m1,uint32_t m0)
 /*!
  * \brief return bit value at pos
  *
- * \params pos bit position 
+ * \param pos bit position 
  *
  * \return bit value
  */
@@ -39,8 +39,8 @@ uint8_t Bits128::Get(int pos)
 /*!
  * \brief set bit value at pos
  *
- * \params pos bit position 
- * \params val value of the bit
+ * \param pos bit position 
+ * \param val value of the bit
  *
  */
 void Bits128::Set(int pos,uint8_t val)
