@@ -334,7 +334,7 @@ SampaHead  head_decoder(header);
   {
     // parse packet
     int curpos = 0;
-    int len;
+    //int len;
     while (curpos < len)
     {
        len = buffer[curpos]+2;
@@ -398,7 +398,7 @@ SampaHead  head_decoder(header);
 
 void Receiver::Process()
 {  
-int      payloadLength;
+int      payloadLength=0;
 int      packetType;
 
 //  if (mPeer == (elink *)0) return;

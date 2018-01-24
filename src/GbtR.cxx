@@ -13,7 +13,8 @@ GbtR::GbtR(gbtlink &provider) :mDataProvider(provider),
 			       mCurSample(-1),
 			       mNbLinks(0),
 			       mNbSampleReaders(0), 
-			       mCurWord(Bits128()),
+			       //mCurWord(Bits128()),
+			       mOffset(0),
 			       mDataAvailable(false)
 {
   mElinkMap.clear();
@@ -60,7 +61,7 @@ bool GbtR::Fetch(int const port,int const sample)
 {
   
   mMutex.lock();
-  if ((sample/2) == mCurSample) {
+  if ((sample/2) < (mCurSample+mOffset)) {
     //
     // a Gbt word carries two bits of information
     // in this case, the current sample is already available
@@ -73,43 +74,70 @@ bool GbtR::Fetch(int const port,int const sample)
   // At the stage, the GBT word has not been read yet, check if all
   // readers are synchronised before fetching it
   //
-  
-  mNbSampleReaders--;
-  if (mNbSampleReaders != 0) {
-    // 
-    // some readers are out of synchronisation, let' wait for them
-    // suspend task
-    //
-    mMutex.unlock();
-    mElinkMap[port]->lock() ;
-    //
-    // returns data availability when all readers are synchronised
-    //
+  if ((sample/2) == (mOffset+mWindowsize-1))
+  {
+    // we run out of memory, wait for all other process to reach the
+    // same point
+    //cout << "GbtR::Fetch " << mCurSample <<" "<<mOffset<<  " " << sample << endl;
+    mNbSampleReaders--;
+    if (mNbSampleReaders != 0) {
+      // 
+      // some readers are out of synchronisation, let' wait for them
+      // suspend task
+      //
+      mMutex.unlock();
+      mElinkMap[port]->lock() ;
+      //
+      // returns data availability when all readers are synchronised
+      //
     return mDataAvailable;
+    }
+    else {
+      //
+      // The last readers is now synchronised, let's get the GBT word
+      // from the distant party and release all pending readers
+      //
+      // fecth a new word
+      //
+      mDataAvailable= mDataProvider.GbtWordAvailable();
+      if (mDataAvailable) {
+        mCurWord[0] = mDataProvider.GetWord();
+	mOffset += mWindowsize;
+        mCurSample = 0;
+        mNbSampleReaders = mNbLinks;
+      }
+      //
+      // free all waiting thread (but ourself)
+      //
+      for (std::map<int,GbtElink *>::iterator it = mElinkMap.begin();it !=mElinkMap.end();it++) {
+//      for (int i=0; i< mNbLinks;i++) { 
+        if (it->first != port) 
+          it->second->unlock() ; 
+      }
+      mMutex.unlock(); // end on critical section
+      if (mDataAvailable == false)
+      {
+        cout <<"wwww" <<endl;
+        mNbLinks--;
+      }
+      return mDataAvailable;
+    }
   }
   else {
-    //
-    // The last readers is now synchronised, let's get the GBT word
-    // from the distant party and release all pending readers
-    //
-    // fecth a new word
-    //
+    // windows is not full, catch a new word
     mDataAvailable= mDataProvider.GbtWordAvailable();
     if (mDataAvailable) {
-      mCurWord = mDataProvider.GetWord();
-      mCurSample++;
-      mNbSampleReaders = mNbLinks;
-    }
-    //
-    // free all waiting thread (but ourself)
-    //
-    for (int i=0; i< mNbLinks;i++) { 
-      if (i != port) 
-        mElinkMap[i]->unlock() ; 
+      mCurSample ++;
+      mCurWord[mCurSample] = mDataProvider.GetWord();
     }
     mMutex.unlock(); // end on critical section
+    if (mDataAvailable == false)
+    {
+      cout <<"wwww" <<endl;
+      mNbLinks--;
+    }
     return mDataAvailable;
-  }
+  }    
 }
 /*!
  *  \brief Read a bit on a given port
@@ -124,5 +152,5 @@ bool GbtR::Fetch(int const port,int const sample)
 
 uint8_t GbtR::Read(int const port,int const sample)
 {
-  return mCurWord.Get(port*2+(1-(sample & 1)));
+  return mCurWord[(sample/2)-mOffset].Get(port*2+(1-(sample & 1)));
 }

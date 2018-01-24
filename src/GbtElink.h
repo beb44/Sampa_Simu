@@ -28,6 +28,10 @@ private:
   
   /*! \brief Synchronisation semaphore                               */
   std::mutex         mMutex;
+  
+  int    mNbLock;
+  int    mNbUnlock;
+
 };
 
 #endif

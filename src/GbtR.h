@@ -36,8 +36,11 @@ private:
   int                          mNbSampleReaders;
 
   /*! \brief current GBT word                                        */
-  Bits128  	               mCurWord;
+  static const int             mWindowsize = 10000;
+  Bits128  	               mCurWord[mWindowsize];
 
+  int                          mCurindex;
+  int                          mOffset;
   /*! \brief True if GBT word has been readout                       */
   bool                         mDataAvailable;
 

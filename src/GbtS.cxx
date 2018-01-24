@@ -93,7 +93,7 @@ int     active_responder = 0;
 uint8_t bit1;
 uint8_t bit2;
 Bits128 mCurWord;
-
+  //int j=0;
   for (int i=0;i<mMaxSocket;i++) {
     if (mElinkMap[i] != 0) {
       //
@@ -103,13 +103,18 @@ Bits128 mCurWord;
       bit1 = mElinkMap[i]->GetSerial();
       if (!(mElinkMap[i]->SerialAvailable())) continue;
       bit2 = mElinkMap[i]->GetSerial();
+      //mCurWord.w[i*2]= bit2;
+      //mCurWord.w[i*2+1]= bit1;
+     
       mCurWord.Set(i*2,bit2 & 1);
       mCurWord.Set(i*2+1, bit1 & 1);
       active_responder++;
     }
     else {
-      mCurWord.Set(i*2,0);
-      mCurWord.Set(i*2+1,0);
+      //mCurWord.Set(i*2,0);
+      //mCurWord.Set(i*2+1,0);
+      //mCurWord.w[i*2]= 0;
+      //mCurWord.w[i*2+1]= 0;
     }
   }
   if (active_responder == mNbRec) {

@@ -10,7 +10,9 @@ using namespace std;
 
 GbtElink::GbtElink(int port,GbtRInterface& gbt): mGbt(gbt), 
                                                  mPort(port),
-						 mSample(0)
+						 mSample(0),
+						 mNbLock(0),
+						 mNbUnlock(0)
 { 
   mMutex.lock();
 }
@@ -43,11 +45,13 @@ uint8_t  GbtElink::GetSerial()
 
 void GbtElink::lock()
 {
+  mNbLock++;
   mMutex.lock();
 }
 
 void GbtElink::unlock()
 {
+  mNbUnlock++;
   mMutex.unlock();
 }
 
