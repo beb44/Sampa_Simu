@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdint>
 #include "GbtR.h"  
+#include "RecInterface.h"  
+
 using namespace std;
 
 /*!
@@ -26,16 +28,18 @@ GbtR::GbtR(gbtlink &provider) :mDataProvider(provider),
  *  \return the allocated Elink 
  */
 
-Elink &GbtR::GetElink(int const port)
+Elink &GbtR::GetElink(RecInterface *rec,int const port)
 {
   //
   // Check ports availability
   //
   if (mElinkMap.find(port) != mElinkMap.end()) throw;
-  //
+  if (mRec.find(port) != mRec.end()) throw;
+ //
   // add the new ports
   //
   mElinkMap[port] = new GbtElink(port,*this);
+  mRec[port] = rec;
   //
   // update internal variables
   mNbLinks++;
@@ -46,6 +50,24 @@ Elink &GbtR::GetElink(int const port)
   return *mElinkMap[port];
 }
 
+void GbtR::Start()
+{
+  while (mDataProvider.GbtWordAvailable()) {
+    Push(mDataProvider.GetWord());
+  }
+  
+}
+
+void GbtR::Push(Bits128 word)
+{
+  for (std::map<int,RecInterface *>::iterator it = mRec.begin();
+                                              it != mRec.end();
+					      it++) {
+					      
+    it->second->Push((word.Get((it->first *2) +1)));
+    it->second->Push((word .Get(it->first *2)));					      
+  }					      
+}
 /*!
  *  \brief Get a new Gbt 128 bit word from the remote GBT
  *

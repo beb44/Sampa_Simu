@@ -151,7 +151,7 @@ Receiver::Receiver(Elink &provider, void *ui,
  *  \param provider : reference of the 'remote' Gbtr
  */
 Receiver::Receiver(int port,GbtR &provider): 
-                                      mPeer(provider.GetElink(port)), 
+                                      mPeer(provider.GetElink(this,port)), 
 				      mPort(port), 
 				      mSynchead(SampaHead().BuildSync()),
 				      mCurHead(0),
@@ -186,7 +186,7 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
                                            StartOfPackerHandler *sop,
                                            PacketHandler        *ph,
 			                   EndOfPackerHandler   *eop): 
-                                      mPeer(provider.GetElink(port)), 
+                                      mPeer(provider.GetElink(this,port)), 
 				      mPort(port), 
 				      mSynchead(SampaHead().BuildSync()),
 				      mCurHead(0),
@@ -221,7 +221,7 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
                                            StartOfPackerHandler     *sop,
                                            ClusterSumPacketHandler *ph,
 			                   EndOfPackerHandler       *eop): 
-                                      mPeer(provider.GetElink(port)), 
+                                      mPeer(provider.GetElink(this,port)), 
 				      mPort(port), 
 				      mSynchead(SampaHead().BuildSync()),
 				      mCurHead(0),
@@ -256,7 +256,7 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
                                            StartOfPackerHandler *sop,
                                            RawPacketHandler     *ph,
 			                   EndOfPackerHandler   *eop): 
-                                      mPeer(provider.GetElink(port)), 
+                                      mPeer(provider.GetElink(this,port)), 
 				      mPort(port), 
 				      mSynchead(SampaHead().BuildSync()),
 				      mCurHead(0),
@@ -398,14 +398,21 @@ SampaHead  head_decoder(header);
 
 void Receiver::Process()
 {  
-int      payloadLength=0;
-int      packetType;
-
-//  if (mPeer == (elink *)0) return;
+//int      payloadLength=0;
+//int      packetType;
+  payloadLength = 0;
   while (mPeer.SerialAvailable()) {
+    ProcessData(mPeer.GetSerial());
+  }
+}
+//  if (mPeer == (elink *)0) return;
+void Receiver::ProcessData(uint8_t word)
+{  
+int      packetType;
+//  while (mPeer.SerialAvailable()) {
     if (mIsSynced) {
       if (mHeadcd !=0) {
-        mCurHead = ((mCurHead >>1) + (((uint64_t)(mPeer.GetSerial()))<<49)) & 0x3ffffffffffff;
+        mCurHead = ((mCurHead >>1) + (((uint64_t)(word))<<49)) & 0x3ffffffffffff;
         mHeadcd --;
 	if (mHeadcd ==0) { 
 	  // header fully loaded, get playload length
@@ -428,7 +435,7 @@ int      packetType;
       }
       else {
         // data reception
-	*mWPointer =  ((*mWPointer) )+((uint64_t)(mPeer.GetSerial())<<mCurBit);
+	*mWPointer =  ((*mWPointer) )+((uint64_t)(word)<<mCurBit);
 	mCurBit++;	
         if (mCurBit==10) {
           // all bits in current word have been sent out
@@ -445,7 +452,7 @@ int      packetType;
     }
     else {
       mSyncPos++;
-      mCurHead = ((mCurHead >>1) + (((uint64_t)(mPeer.GetSerial()))<<49)) & 0x3ffffffffffff;
+      mCurHead = ((mCurHead >>1) + (((uint64_t)(word))<<49)) & 0x3ffffffffffff;
       if (mCurHead == mSynchead) {
 	//m_curhead << "payload length " << payload_length << endl;
         mIsSynced= true;
@@ -457,9 +464,13 @@ int      packetType;
 	mStats.mPacketCount++;
       }	
     }
-  }  
+//  }  
 }
 
+void Receiver::Push(uint8_t data)
+{
+  ProcessData(data);
+}
 // statistic handling
 /*!
  *  \brief Constructor

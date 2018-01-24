@@ -4,6 +4,7 @@
 #include <map>
 #include <mutex>
 #include <condition_variable>
+#include "RecInterface.h"
 #include "GbtRInterface.h"
 #include "Bits128.h"
 #include "Elink.h"
@@ -16,9 +17,11 @@ class GbtR: public GbtRInterface
 {
 public:
   GbtR(gbtlink &provider);
-  Elink   &GetElink(int const port);
+  Elink   &GetElink(RecInterface *rec,int const port);
   bool    Fetch(int const port,int const sample) ;
   uint8_t Read(int const port,int const sample);
+  void    Push(Bits128 word);
+  void    Start();
 private:
   /*! \brief Reference of the data provider (i.e. remote GbtS)       */
   gbtlink                      &mDataProvider; 
@@ -46,6 +49,7 @@ private:
 
   /*! \brief mCurSample protection mutex                             */
   std::mutex		       mMutex;
+  std::map<int,RecInterface *> mRec;
  
 };
 #endif

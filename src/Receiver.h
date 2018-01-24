@@ -11,7 +11,7 @@ typedef void (PacketHandler)(void *ui,int addr,int ch,int nbsamp,int ts,short *b
 typedef void (RawPacketHandler)(void *ui,int addr,int ch,int len,short *buff);
 typedef void (StartOfPackerHandler)(void *ui,uint64_t header);
 typedef void (EndOfPackerHandler)(void *ui);
-class ReceiverHandler
+class ReceiverHandler 
 {
 public:
   virtual void  RecHandler(int addr,int ch,int nbsamp,int ts,int len, short *buff) = 0;
@@ -21,7 +21,7 @@ public:
  * \brief Received packet parser
  */
 
-class Receiver
+class Receiver : public RecInterface
 {
 
   /*!
@@ -76,7 +76,9 @@ public:
   void Start();
   void Join();
   bool Joinable();
+  void Push(uint8_t data);
   void Process();
+  void ProcessData(uint8_t word);
   void DisplayStats();
   void ResetStats();
 private:
@@ -131,5 +133,8 @@ private:
   RawPacketHandler        *mPacketRawHandler;
   /*! \brief End of packet user handler                              */
   EndOfPackerHandler      *mEndOfPackerHandler;
+  
+  int      payloadLength;
+
 };
 #endif
