@@ -63,8 +63,8 @@ GBits128 *mCurWord = new GBits128;
 	active_responder++;
       }
       else {
-        mCurWord->word.Set(i*2,0);
-        mCurWord->word.Set(i*2+1,0);
+        //mCurWord->word.Set(i*2,0);
+        //mCurWord->word.Set(i*2+1,0);
       }
     }
     if (active_responder == mNbRec) {
@@ -123,7 +123,7 @@ GBits128 *mCurWord = new GBits128;
       mCurWord->word.Set(i*2+1, bit1 & 1);
       active_responder++;
     }
-  }
+  } 
   if (active_responder == mNbRec) {
     //
     // all link have returned data, push word for sending
