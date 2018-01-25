@@ -110,16 +110,17 @@ void t2 (void *ui,int addr,int ch,int nbsamp,int ts,short *buff)
 }
 Receiver rec11(ds1,NULL,NULL,toto,NULL);
 
-int main()
+int test2()
 {
 
-  for (int i=1;i<20;i++)
+  for (int i=1;i<2;i++)
   {
-    Test  t1(i*10,5000);
+    Test2  t1(1,5000);
 
     t1.start();
     t1.display();
   }
+  return 0;
   for (int i=1;i<20;i++)
   {
     Test1  t1(i*10,5000);
@@ -127,4 +128,46 @@ int main()
     t1.start();
     t1.display();
   }
+  return 0;
+}
+DualSampa dsT1(100,102);
+DualSampa dsT2(100,102);
+int llop1 = 2;
+int llop2 = 5;
+void dsp_handlerT1(int ref)
+{
+cout << "eeee" << endl;
+  if (llop1==0) return;
+  llop1--;
+  if (ref == 0)  dsT1.RegenerateData();
+  if (ref == 1)  dsT2.RegenerateData();
+}
+void rec_handler_s1(void *ui,int addr,int ch,int nbsamp,int ts, short *buff)
+{
+}
+
+int test3()
+{
+GbtS     gbt_s2;
+GbtR     gbt_r1(gbt_s2);
+Receiver rec(0,gbt_r1,NULL,NULL,rec_handler_s1,NULL);
+Receiver rec1(1,gbt_r1,NULL,NULL,rec_handler_s1,NULL);
+
+  dsT1.SetDataProvider(dsp_handlerT1);
+  dsT1.SetInternalRef(0);
+  dsT2.SetDataProvider(dsp_handlerT1);
+  dsT2.SetInternalRef(1);
+  gbt_s2.PlugElink(0,&dsT1);
+  gbt_s2.PlugElink(1,&dsT2);
+  rec.SetUserHandler(rec_handler);
+ 
+   rec.Start(); 
+   rec1.Start(); 
+   rec.Join(); 
+   rec1.Join(); 
+}
+int main()
+{
+  test2();
+  return 0;
 }

@@ -103,3 +103,70 @@ uint16_t data[4] = {7,2,0x1,0x20};
   dsarr[ref]->RegenerateData();
   //std::this_thread::yield();
 } 
+
+void RecHandler2(void * ui,int addr,int ch,int nbsamp,int ts, short *buff)
+{
+ ((Test2 *)ui)->RecHandler(addr,ch,nbsamp,ts, buff);
+}
+
+Test2::Test2(int nbthread,int nbloop)
+{
+  dsarr.clear();
+  recarr.clear(); 
+  _nbthread = nbthread; 
+  _nbloop  = nbloop;
+  title    = "Test through Gbt Links";
+}
+
+void Test2::start()
+{ 
+  gbts      = new GbtS();
+  gbtr      = new GbtR(*gbts);
+  for (int i=0; i< _nbthread;i++)
+  {
+    looparr[i]= _nbloop;
+    dsarr[i]= new DualSampa(i*2,i*2+1);
+    gbts->PlugElink(i,dsarr[i]);
+
+    dsarr[i]->SetInternalRef(i);
+    dsarr[i]->SetDataProvider(static_cast<DualSampaHandler&>( *this));
+    recarr[i] = new Receiver(i,*gbtr,(void *)this,NULL,RecHandler2,NULL);
+//    recarr[i] = new Receiver(*dsarr[i],(void *)this,NULL,RecHandler2,NULL);
+    //recarr[i]->SetUserHandler(this);
+  }
+  //recarr[0]->display_stats();
+
+  //std::chrono::time_point<std::chrono::system_clock> start, end;
+  cstart = std::chrono::system_clock::now();
+  laststarted= std::chrono::system_clock::now();
+  //for (int i=0; i< _nbthread;i++) recarr[i]->Start();
+  //for (int i=0; i< _nbthread;i++)  if (recarr[i]->Joinable()) recarr[i]->Join();
+  gbtr->Start();
+  cend = std::chrono::system_clock::now();
+}       
+void Test2::DspHandler(int ref) 
+{
+  if (looparr[ref] == _nbloop) 
+  {
+    laststarted= std::chrono::system_clock::now();
+  }
+//  cout <<looparr[ref] << " " << ref << endl;
+  if (looparr[ref]-- <= 0)return;
+  dsarr[ref]->RegenerateData();
+}
+void Test2::RecHandler(int addr,int ch,int nbsamp,int ts, short *buff)
+{
+}
+void Test2::display()
+{
+  int elapsed_seconds = std::chrono::duration_cast<std::chrono::milliseconds>
+                             (cend-cstart).count();  
+  cout << "Test condition : " << title<< " "<< _nbthread << " " << _nbloop;			     
+  std::cout <<  " elapsed time: " << elapsed_seconds << " ms "; 
+  std::cout <<  " mean time per thread: "<< elapsed_seconds/_nbthread <<endl;
+  elapsed_seconds = std::chrono::duration_cast<std::chrono::milliseconds>
+                             (laststarted-cstart).count(); 
+//  std::cout <<  "last started thread after: " << elapsed_seconds << " ms" << endl;;
+			     
+}
+
