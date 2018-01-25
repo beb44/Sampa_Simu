@@ -14,6 +14,13 @@
 
 class GbtS: public gbtlink
 {
+  
+
+struct GBits128
+{
+  Bits128    word;
+  GBits128    *next;
+};
 
 public:
   GbtS();
@@ -27,9 +34,11 @@ private:
   static const int    mMaxSocket = 40;
   /*! \brief Address of the Elink data provider connected to a port  */
   Elink               *mElinkMap[mMaxSocket];
-  /*! \brief Sending queue                                           */
-  std::list<Bits128>  mSendList;
   /*! \brief Number of active connected ports                        */
   int                 mNbRec;
+  /*! \brief Sending queue head                                      */
+  GBits128            *QueueH;
+  /*! \brief Sending queue tail                                      */
+  GBits128            *QueueT;
 };
 #endif

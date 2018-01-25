@@ -5,10 +5,11 @@ using namespace std;
 /*!
  * \brief constructor
  */
-GbtS::GbtS() : mNbRec(0)
+GbtS::GbtS() : mNbRec(0),
+               QueueH(NULL),
+	       QueueT(NULL)
 {
 
-  mSendList.clear();
   // reset elink map
   for (int i=0;i<mMaxSocket;i++) mElinkMap[i] = NULL;
 }
@@ -42,7 +43,7 @@ void GbtS::Process()
 int     active_responder;
 uint8_t bit1;
 uint8_t bit2;
-Bits128 mCurWord;
+GBits128 *mCurWord = new GBits128;
 
   while (active_responder != 0) {
     // reset nb responder
@@ -57,20 +58,32 @@ Bits128 mCurWord;
 	  continue;
 	}
 	bit2 = mElinkMap[i]->GetSerial();
-        mCurWord.Set(i*2,bit2 & 1);
-        mCurWord.Set(i*2+1, bit1 & 1);
+        mCurWord->word.Set(i*2,bit2 & 1);
+        mCurWord->word.Set(i*2+1, bit1 & 1);
 	active_responder++;
       }
       else {
-        mCurWord.Set(i*2,0);
-        mCurWord.Set(i*2+1,0);
+        mCurWord->word.Set(i*2,0);
+        mCurWord->word.Set(i*2+1,0);
       }
     }
     if (active_responder == mNbRec) {
       //
-      // all link have returned data, push word for sending
-      //
-      mSendList.push_back(mCurWord);
+     // all link have returned data, push word for sending
+     //
+     if (QueueH == NULL)
+     {
+       QueueH = mCurWord;
+       QueueT = mCurWord;
+     }
+     else
+     {
+       QueueT->next = mCurWord;
+       QueueT = mCurWord;
+     }
+    }
+    else {
+      free(mCurWord);
     }
   } // end while (active....
 }
@@ -92,7 +105,7 @@ bool GbtS::GbtWordAvailable()
 int     active_responder = 0;
 uint8_t bit1;
 uint8_t bit2;
-Bits128 mCurWord;
+GBits128 *mCurWord = new GBits128;
   //int j=0;
   for (int i=0;i<mMaxSocket;i++) {
     if (mElinkMap[i] != 0) {
@@ -106,22 +119,27 @@ Bits128 mCurWord;
       //mCurWord.w[i*2]= bit2;
       //mCurWord.w[i*2+1]= bit1;
      
-      mCurWord.Set(i*2,bit2 & 1);
-      mCurWord.Set(i*2+1, bit1 & 1);
+      mCurWord->word.Set(i*2,bit2 & 1);
+      mCurWord->word.Set(i*2+1, bit1 & 1);
       active_responder++;
-    }
-    else {
-      //mCurWord.Set(i*2,0);
-      //mCurWord.Set(i*2+1,0);
-      //mCurWord.w[i*2]= 0;
-      //mCurWord.w[i*2+1]= 0;
     }
   }
   if (active_responder == mNbRec) {
     //
     // all link have returned data, push word for sending
     //
-    mSendList.push_back(mCurWord);
+    if (QueueH == NULL) {
+      QueueH = mCurWord;
+      QueueT = mCurWord;
+    }
+    else {
+      QueueT->next = mCurWord;
+      QueueT = mCurWord;
+    }
+    // mSendList.push_back(mCurWord);
+  }
+  else {
+    free(mCurWord);
   }
   return (active_responder == mNbRec);
 }
@@ -139,9 +157,13 @@ Bits128 mCurWord;
 Bits128 GbtS::GetWord()
 {
 Bits128   word;
+GBits128  *tmp;
 
-  if (mSendList.size() ==0) return Bits128(0xff,0xff,0xff,0xff);  
-  word = mSendList.front() ;
-  mSendList.pop_front();
+  if ( QueueH == NULL) return Bits128(0xff,0xff,0xff,0xff);
+  tmp = QueueH;
+  word = QueueH->word; 
+  QueueH = QueueH->next;
+  if (QueueH == NULL) QueueT = NULL;
+  free(tmp);
   return word;
 }
