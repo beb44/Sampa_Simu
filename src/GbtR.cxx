@@ -17,6 +17,7 @@ GbtR::GbtR(gbtlink &provider) :mDataProvider(provider),
 			       mNbSampleReaders(0), 
 			       //mCurWord(Bits128()),
 			       mOffset(0),
+			       mPOffset(0),
 			       mDataAvailable(false)
 {
   mElinkMap.clear();
@@ -81,8 +82,9 @@ void GbtR::Push(Bits128 word)
 
 bool GbtR::Fetch(int const port,int const sample) 
 {
-  
+ #if ONTHEFLY     
   mMutex.lock();
+//  if ((sample/2) < (mCurSample+mOffset)) {
   if ((sample/2) < (mCurSample+mOffset)) {
     //
     // a Gbt word carries two bits of information
@@ -92,11 +94,18 @@ bool GbtR::Fetch(int const port,int const sample)
     mMutex.unlock();
     return true;
   }
+#else
+  if ((sample/2) < (mCurSample+mOffset)) {
+    return true;
+  }
+  mMutex.lock();
+#endif
   //
   // At the stage, the GBT word has not been read yet, check if all
   // readers are synchronised before fetching it
   //
-  if ((sample/2) == (mOffset+mWindowsize-1))
+//  if ((sample/2) == (mOffset+mWindowsize-1))
+  if (1)
   {
     // we run out of memory, wait for all other process to reach the
     // same point
@@ -121,6 +130,7 @@ bool GbtR::Fetch(int const port,int const sample)
       //
       // fecth a new word
       //
+#if ONTHEFLY     
       mDataAvailable= mDataProvider.GbtWordAvailable();
       if (mDataAvailable) {
         mCurWord[0] = mDataProvider.GetWord();
@@ -128,6 +138,19 @@ bool GbtR::Fetch(int const port,int const sample)
         mCurSample = 0;
         mNbSampleReaders = mNbLinks;
       }
+#else
+      mCurSample = 0;
+      while (mDataProvider.GbtWordAvailable()){
+        if (mCurSample == mWindowsize) break;
+	mCurWord[mCurSample] = mDataProvider.GetWord();
+	mCurSample++;
+      }
+      mOffset = mPOffset;
+      mPOffset += mCurSample;
+      mNbSampleReaders = mNbLinks;
+      mDataAvailable= mDataProvider.GbtWordAvailable();
+    
+#endif
       //
       // free all waiting thread (but ourself)
       //
@@ -171,8 +194,10 @@ bool GbtR::Fetch(int const port,int const sample)
  *
  *  \return bit information 
  */
-
+#if 0
 uint8_t GbtR::Read(int const port,int const sample)
 {
-  return mCurWord[(sample/2)-mOffset].Get(port*2+(1-(sample & 1)));
+//  return mCurWord[(sample>>1)-mOffset].Get((port<<1)+(1-(sample & 1)));
+  return mCurWord[(sample>>1)-mOffset].Get((port<<1)+((~sample) & 1));
 }
+#endif

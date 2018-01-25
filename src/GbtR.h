@@ -19,7 +19,11 @@ public:
   GbtR(gbtlink &provider);
   Elink   &GetElink(RecInterface *rec,int const port);
   bool    Fetch(int const port,int const sample) ;
-  uint8_t Read(int const port,int const sample);
+  uint8_t Read(int const port,int const sample)
+  {
+  //  return mCurWord[(sample>>1)-mOffset].Get((port<<1)+(1-(sample & 1)));
+    return mCurWord[(sample>>1)-mOffset].Get((port<<1)+((~sample) & 1));
+  };
   void    Push(Bits128 word);
   void    Start();
 private:
@@ -39,11 +43,12 @@ private:
   int                          mNbSampleReaders;
 
   /*! \brief current GBT word                                        */
-  static const int             mWindowsize = 10000;
+  static const int             mWindowsize = 8192;
   Bits128  	               mCurWord[mWindowsize];
 
   int                          mCurindex;
   int                          mOffset;
+  int                          mPOffset;
   /*! \brief True if GBT word has been readout                       */
   bool                         mDataAvailable;
 
