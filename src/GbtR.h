@@ -15,6 +15,15 @@
  */
 class GbtR: public GbtRInterface
 {
+
+class RecRecord
+{
+public:
+  RecRecord(int port,RecInterface *rec): mPort(port),mRec(rec){};
+  int          mPort;
+  RecInterface *mRec;
+};
+
 public:
   GbtR(gbtlink &provider);
   Elink   &GetElink(RecInterface *rec,int const port);
@@ -54,7 +63,8 @@ private:
 
   /*! \brief mCurSample protection mutex                             */
   std::mutex		       mMutex;
-  std::map<int,RecInterface *> mRec;
- 
+  //std::map<int,RecInterface *> mRec;
+  RecRecord                    *mRec[40];
+  int                          mRecNumber;  
 };
 #endif

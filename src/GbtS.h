@@ -22,6 +22,56 @@ struct GBits128
   GBits128    *next;
 };
 
+  class Queue
+  {
+  public:
+    GBits128 *Alloc()
+    {
+      if (QueueF==NULL)
+        return new GBits128;
+      GBits128 *ret = QueueF;
+      QueueF = QueueF->next;
+      return ret;
+    }
+    void Free(GBits128 *ret)
+    {
+      ret->next = QueueF;
+      QueueF = ret;
+    }   
+    
+    void EnQueue(GBits128 *ret)
+    {
+      if (QueueH == NULL) {
+        QueueH = ret;
+        QueueT = ret;
+	ret->next = NULL;
+      }
+      else {
+       QueueT->next = ret;
+       QueueT = ret;
+     }
+    }
+    
+    GBits128 *DeQueue()
+    {
+      GBits128 *ret = QueueH; 
+      QueueH = QueueH->next;
+      if (QueueH == NULL) QueueT = NULL;
+      return ret;
+    }
+    
+    bool IsEmpty()
+    {
+      return (QueueH == NULL);
+    }
+    private:
+      /*! \brief Sending queue head                                    */
+      GBits128            *QueueH;
+      /*! \brief Sending queue tail                                    */
+      GBits128            *QueueT;
+      static GBits128     *QueueF;
+  };
+  
 public:
   GbtS();
   void PlugElink(const uint8_t socket,Elink *peer);
@@ -37,7 +87,7 @@ private:
   /*! \brief Number of active connected ports                        */
   int                 mNbRec;
   /*! \brief Sending queue head                                      */
-  GBits128            *QueueH;
+  Queue               MyQueue;
   /*! \brief Sending queue tail                                      */
   GBits128            *QueueT;
 };

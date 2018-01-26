@@ -2,12 +2,13 @@
 #include "GbtS.h"
 #include "Bits128.h"
 using namespace std;
+GbtS::GBits128 *GbtS::Queue::QueueF = NULL;
+ 
+
 /*!
  * \brief constructor
  */
-GbtS::GbtS() : mNbRec(0),
-               QueueH(NULL),
-	       QueueT(NULL)
+GbtS::GbtS() : mNbRec(0)
 {
 
   // reset elink map
@@ -43,7 +44,7 @@ void GbtS::Process()
 int     active_responder;
 uint8_t bit1;
 uint8_t bit2;
-GBits128 *mCurWord = new GBits128;
+GBits128 *mCurWord = MyQueue.Alloc();
 
   while (active_responder != 0) {
     // reset nb responder
@@ -61,7 +62,7 @@ GBits128 *mCurWord = new GBits128;
         mCurWord->word.Set(i*2,bit2 & 1);
         mCurWord->word.Set(i*2+1, bit1 & 1);
 	active_responder++;
-      }
+      } 
       else {
         //mCurWord->word.Set(i*2,0);
         //mCurWord->word.Set(i*2+1,0);
@@ -69,21 +70,12 @@ GBits128 *mCurWord = new GBits128;
     }
     if (active_responder == mNbRec) {
       //
-     // all link have returned data, push word for sending
-     //
-     if (QueueH == NULL)
-     {
-       QueueH = mCurWord;
-       QueueT = mCurWord;
-     }
-     else
-     {
-       QueueT->next = mCurWord;
-       QueueT = mCurWord;
-     }
+      // all link have returned data, push word for sending
+      //
+      MyQueue.EnQueue(mCurWord);
     }
     else {
-      free(mCurWord);
+      MyQueue.Free(mCurWord);
     }
   } // end while (active....
 }
@@ -105,7 +97,7 @@ bool GbtS::GbtWordAvailable()
 int     active_responder = 0;
 uint8_t bit1;
 uint8_t bit2;
-GBits128 *mCurWord = new GBits128;
+GBits128 *mCurWord = MyQueue.Alloc();
   //int j=0;
   for (int i=0;i<mMaxSocket;i++) {
     if (mElinkMap[i] != 0) {
@@ -128,15 +120,7 @@ GBits128 *mCurWord = new GBits128;
     //
     // all link have returned data, push word for sending
     //
-    if (QueueH == NULL) {
-      QueueH = mCurWord;
-      QueueT = mCurWord;
-    }
-    else {
-      QueueT->next = mCurWord;
-      QueueT = mCurWord;
-    }
-    // mSendList.push_back(mCurWord);
+    MyQueue.EnQueue(mCurWord);
   }
   else {
     free(mCurWord);
@@ -159,11 +143,9 @@ Bits128 GbtS::GetWord()
 Bits128   word;
 GBits128  *tmp;
 
-  if ( QueueH == NULL) return Bits128(0xff,0xff,0xff,0xff);
-  tmp = QueueH;
-  word = QueueH->word; 
-  QueueH = QueueH->next;
-  if (QueueH == NULL) QueueT = NULL;
-  free(tmp);
+  if (MyQueue.IsEmpty()) return Bits128(0xff,0xff,0xff,0xff);
+  tmp = MyQueue.DeQueue();
+  word = tmp->word; 
+  MyQueue.Free(tmp);
   return word;
 }

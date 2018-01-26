@@ -35,12 +35,12 @@ Elink &GbtR::GetElink(RecInterface *rec,int const port)
   // Check ports availability
   //
   if (mElinkMap.find(port) != mElinkMap.end()) throw;
-  if (mRec.find(port) != mRec.end()) throw;
- //
+  //if (mRec.find(port) != mRec.end()) throw;
+  //
   // add the new ports
   //
   mElinkMap[port] = new GbtElink(port,*this);
-  mRec[port] = rec;
+  mRec[mRecNumber++] = new RecRecord(port,rec);
   //
   // update internal variables
   mNbLinks++;
@@ -61,13 +61,21 @@ void GbtR::Start()
 
 void GbtR::Push(Bits128 word)
 {
+#ifdef STL
   for (std::map<int,RecInterface *>::iterator it = mRec.begin();
                                               it != mRec.end();
 					      it++) {
 					      
     it->second->Push((word.Get((it->first *2) +1)));
     it->second->Push((word .Get(it->first *2)));					      
-  }					      
+  }
+#else
+  for (int i=0;i<mRecNumber;i++) 
+  {
+    mRec[i]->mRec->Push((word.Get((mRec[i]->mPort *2) +1)));
+    mRec[i]->mRec->Push((word.Get((mRec[i]->mPort *2))));
+  }
+#endif 					      
 }
 /*!
  *  \brief Get a new Gbt 128 bit word from the remote GBT
