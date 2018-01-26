@@ -39,8 +39,8 @@ add_library(sampareceiver SHARED
         )
 target_link_libraries(sampareceiver PUBLIC sampabase Threads::Threads)
 
-add_executable(sampaTest main.cxx test.cxx)
-target_link_libraries(sampaTest sampasender sampareceiver)
+add_executable(sampaMain main.cxx test.cxx)
+target_link_libraries(sampaMain sampasender sampareceiver)
 
 # fake target to get IDEs to take those files into account even if they
 # are not part of any other target
