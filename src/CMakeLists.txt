@@ -1,4 +1,7 @@
+cmake_policy(SET CMP0057 NEW)
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
+
 find_package(Threads REQUIRED)
 
 add_library(sampabase SHARED
@@ -42,4 +45,9 @@ target_link_libraries(sampaTest sampasender sampareceiver)
 # fake target to get IDEs to take those files into account even if they
 # are not part of any other target
 add_custom_target(sampa_ide SOURCES documentation.h interface.cxx interface.h test.h Doxyfile)
+
+find_package(Doxygen REQUIRED dot)
+if (DOXYGEN_FOUND)
+    doxygen_add_docs(doc)
+endif ()
 
