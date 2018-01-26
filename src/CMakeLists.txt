@@ -45,9 +45,10 @@ target_link_libraries(sampaMain sampasender sampareceiver)
 # fake target to get IDEs to take those files into account even if they
 # are not part of any other target
 add_custom_target(sampa_ide SOURCES documentation.h interface.cxx interface.h test.h Doxyfile)
-
-find_package(Doxygen REQUIRED dot)
-if (DOXYGEN_FOUND)
+IF (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 3.8)
+  find_package(Doxygen REQUIRED dot)
+  if (DOXYGEN_FOUND)
     doxygen_add_docs(doc)
+  endif ()
 endif ()
 
