@@ -31,11 +31,11 @@ Receiver::Receiver(Elink &provider) : mPeer(provider),
                                       mIsSynced(false),
 				      mSyncPos(0),
 				      mUi(NULL),
-		                      mStartOfPackerHandler(NULL),
+		                      mStartOfPacketHandler(NULL),
 		                      mPacketHandler(NULL),
 		                      mClusterSumPacketHandler(NULL),
 		                      mPacketRawHandler(NULL),
-		                      mEndOfPackerHandler(NULL)
+		                      mEndOfPacketHandler(NULL)
 
 {  
   user_handler = 0;
@@ -56,9 +56,9 @@ Receiver::Receiver(Elink &provider) : mPeer(provider),
  *  \param eop       Etart Of Packet user handler
  */
 Receiver::Receiver(Elink &provider,void *ui,
-                                   StartOfPackerHandler *sop,
+                                   StartOfPacketHandler *sop,
                                    PacketHandler *ph,
-			           EndOfPackerHandler *eop) 
+			           EndOfPacketHandler *eop) 
                                     : mPeer(provider),
                                       mPort(0),
 				      mSynchead(SampaHead().BuildSync()),
@@ -66,11 +66,11 @@ Receiver::Receiver(Elink &provider,void *ui,
                                       mIsSynced(false),
 				      mSyncPos(0),
 				      mUi(ui),
-		                      mStartOfPackerHandler(sop),
+		                      mStartOfPacketHandler(sop),
 		                      mPacketHandler(ph),
 		                      mClusterSumPacketHandler(NULL),
 		                      mPacketRawHandler(NULL),
-		                      mEndOfPackerHandler(eop)
+		                      mEndOfPacketHandler(eop)
 {  
   user_handler = 0;
   mRecHandl = 0;
@@ -90,9 +90,9 @@ Receiver::Receiver(Elink &provider,void *ui,
  *  \param eop       Etart Of Packet user handler
  */
 Receiver::Receiver(Elink &provider,void *ui,
-                                   StartOfPackerHandler *sop,
+                                   StartOfPacketHandler *sop,
                                    ClusterSumPacketHandler *ph,
-			           EndOfPackerHandler *eop) 
+			           EndOfPacketHandler *eop) 
                                     : mPeer(provider),
                                       mPort(0),
 				      mSynchead(SampaHead().BuildSync()),
@@ -100,11 +100,11 @@ Receiver::Receiver(Elink &provider,void *ui,
                                       mIsSynced(false),
 				      mSyncPos(0),
 				      mUi(ui),
-		                      mStartOfPackerHandler(sop),
+		                      mStartOfPacketHandler(sop),
 		                      mPacketHandler(NULL),
 		                      mClusterSumPacketHandler(ph),
 		                      mPacketRawHandler(NULL),
-		                      mEndOfPackerHandler(eop)
+		                      mEndOfPacketHandler(eop)
 {  
   user_handler = 0;
   mRecHandl = 0;
@@ -124,9 +124,9 @@ Receiver::Receiver(Elink &provider,void *ui,
  *  \param eop       Etart Of Packet user handler
  */
 Receiver::Receiver(Elink &provider, void *ui,
-                                   StartOfPackerHandler *sop,
+                                   StartOfPacketHandler *sop,
                                    RawPacketHandler *ph,
-			           EndOfPackerHandler *eop) 
+			           EndOfPacketHandler *eop) 
                                     : mPeer(provider),
                                       mPort(0),
 				      mSynchead(SampaHead().BuildSync()),
@@ -134,11 +134,11 @@ Receiver::Receiver(Elink &provider, void *ui,
                                       mIsSynced(false),
 				      mSyncPos(0),
 				      mUi(ui),
-		                      mStartOfPackerHandler(sop),
+		                      mStartOfPacketHandler(sop),
 		                      mPacketHandler(NULL),
 		                      mClusterSumPacketHandler(NULL),
 		                      mPacketRawHandler(ph),
-		                      mEndOfPackerHandler(eop)
+		                      mEndOfPacketHandler(eop)
 {  
   user_handler = 0;
   mRecHandl = 0;
@@ -158,11 +158,11 @@ Receiver::Receiver(int port,GbtR &provider):
                                       mIsSynced(false),
 				      mSyncPos(0),
 				      mUi(NULL),
-		                      mStartOfPackerHandler(NULL),
+		                      mStartOfPacketHandler(NULL),
 		                      mPacketHandler(NULL),
 		                      mClusterSumPacketHandler(NULL),
 		                      mPacketRawHandler(NULL),
-		                      mEndOfPackerHandler(NULL)
+		                      mEndOfPacketHandler(NULL)
 {
   user_handler = 0;
   mRecHandl = 0;
@@ -183,9 +183,9 @@ Receiver::Receiver(int port,GbtR &provider):
  *  \param eop       Etart Of Packet user handler
  */
 Receiver::Receiver(int port,GbtR &provider,void *ui,
-                                           StartOfPackerHandler *sop,
+                                           StartOfPacketHandler *sop,
                                            PacketHandler        *ph,
-			                   EndOfPackerHandler   *eop): 
+			                   EndOfPacketHandler   *eop): 
                                       mPeer(provider.GetElink(this,port)), 
 				      mPort(port), 
 				      mSynchead(SampaHead().BuildSync()),
@@ -193,11 +193,11 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
                                       mIsSynced(false),
 				      mSyncPos(0),
 				      mUi(ui),
-		                      mStartOfPackerHandler(NULL),
+		                      mStartOfPacketHandler(NULL),
 		                      mPacketHandler(ph),
 		                      mClusterSumPacketHandler(NULL),
 		                      mPacketRawHandler(NULL),
-		                      mEndOfPackerHandler(NULL)
+		                      mEndOfPacketHandler(NULL)
 {
   user_handler = 0;
   mRecHandl = 0;
@@ -218,9 +218,9 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
  *  \param eop       Etart Of Packet user handler
  */
 Receiver::Receiver(int port,GbtR &provider,void *ui,
-                                           StartOfPackerHandler     *sop,
+                                           StartOfPacketHandler     *sop,
                                            ClusterSumPacketHandler *ph,
-			                   EndOfPackerHandler       *eop): 
+			                   EndOfPacketHandler       *eop): 
                                       mPeer(provider.GetElink(this,port)), 
 				      mPort(port), 
 				      mSynchead(SampaHead().BuildSync()),
@@ -228,11 +228,11 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
                                       mIsSynced(false),
 				      mSyncPos(0),
 				      mUi(ui),
-		                      mStartOfPackerHandler(NULL),
+		                      mStartOfPacketHandler(NULL),
 		                      mPacketHandler(NULL),
 		                      mClusterSumPacketHandler(ph),
 		                      mPacketRawHandler(NULL),
-		                      mEndOfPackerHandler(NULL)
+		                      mEndOfPacketHandler(NULL)
 {
   user_handler = 0;
   mRecHandl = 0;
@@ -253,9 +253,9 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
  */
 
 Receiver::Receiver(int port,GbtR &provider,void *ui,
-                                           StartOfPackerHandler *sop,
+                                           StartOfPacketHandler *sop,
                                            RawPacketHandler     *ph,
-			                   EndOfPackerHandler   *eop): 
+			                   EndOfPacketHandler   *eop): 
                                       mPeer(provider.GetElink(this,port)), 
 				      mPort(port), 
 				      mSynchead(SampaHead().BuildSync()),
@@ -263,11 +263,11 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
                                       mIsSynced(false),
 				      mSyncPos(0),
 				      mUi(ui),
-		                      mStartOfPackerHandler(NULL),
+		                      mStartOfPacketHandler(NULL),
 		                      mPacketHandler(NULL),
 		                      mClusterSumPacketHandler(NULL),
 		                      mPacketRawHandler(ph),
-		                      mEndOfPackerHandler(NULL)
+		                      mEndOfPacketHandler(NULL)
 {
   user_handler = 0;
   mRecHandl = 0;
@@ -329,7 +329,7 @@ SampaHead  head_decoder(header);
 
   head_decoder.Decode(); 
   //head_decoder.display();
-  if (mStartOfPackerHandler) mStartOfPackerHandler(mUi,header);
+  if (mStartOfPacketHandler) mStartOfPacketHandler(mUi,header);
   if (mPacketHandler)
   {
     // parse packet
@@ -337,14 +337,13 @@ SampaHead  head_decoder(header);
     //int len;
     while (curpos < len)
     {
-       len = buffer[curpos]+2;
        mPacketHandler(mUi,
                       head_decoder.mFChipAddress,
   		      head_decoder.mFChannelAddress,
 		      buffer[curpos],
 		      buffer[curpos+1],
 		     (short *)&buffer[curpos+2]);
-       curpos += len;
+       curpos += buffer[curpos]+2;
     }
   }
   if (mClusterSumPacketHandler)
@@ -384,7 +383,7 @@ SampaHead  head_decoder(header);
 				 len,
 				 (short *)&buffer[2]);
 				
-  if (mEndOfPackerHandler) mEndOfPackerHandler(mUi);
+  if (mEndOfPacketHandler) mEndOfPacketHandler(mUi);
 
 }
 /*!

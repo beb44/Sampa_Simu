@@ -9,8 +9,8 @@
 typedef void (ClusterSumPacketHandler)(void *ui,int addr,int ch,int nbsamp,int ts,int val);
 typedef void (PacketHandler)(void *ui,int addr,int ch,int nbsamp,int ts,short *buff);
 typedef void (RawPacketHandler)(void *ui,int addr,int ch,int len,short *buff);
-typedef void (StartOfPackerHandler)(void *ui,uint64_t header);
-typedef void (EndOfPackerHandler)(void *ui);
+typedef void (StartOfPacketHandler)(void *ui,uint64_t header);
+typedef void (EndOfPacketHandler)(void *ui);
 class ReceiverHandler 
 {
 public:
@@ -47,30 +47,30 @@ public:
   Receiver();
   Receiver(Elink &provider);
   Receiver(Elink &provider,void *ui,
-                           StartOfPackerHandler *sop,
+                           StartOfPacketHandler *sop,
                            PacketHandler *ph,
-			   EndOfPackerHandler *eop);
+			   EndOfPacketHandler *eop);
   Receiver(Elink &provider,void *ui,
-                           StartOfPackerHandler *sop,
+                           StartOfPacketHandler *sop,
                            ClusterSumPacketHandler *ph,
-			   EndOfPackerHandler *eop);
+			   EndOfPacketHandler *eop);
   Receiver(Elink &provider,void *ui,
-                           StartOfPackerHandler *sop,
+                           StartOfPacketHandler *sop,
                            RawPacketHandler *ph,
-			   EndOfPackerHandler *eop);
+			   EndOfPacketHandler *eop);
   Receiver(int port,GbtR &provider);
   Receiver(int port,GbtR &provider,void *ui,
-                                   StartOfPackerHandler *sop,
+                                   StartOfPacketHandler *sop,
                                    PacketHandler *ph,
-			           EndOfPackerHandler *eop);
+			           EndOfPacketHandler *eop);
   Receiver(int port,GbtR &provider,void *ui,
-                                   StartOfPackerHandler *sop,
+                                   StartOfPacketHandler *sop,
                                    ClusterSumPacketHandler *ph,
-			           EndOfPackerHandler *eop);
+			           EndOfPacketHandler *eop);
   Receiver(int port,GbtR &provider,void *ui,
-                                   StartOfPackerHandler *sop,
+                                   StartOfPacketHandler *sop,
                                    RawPacketHandler *ph,
-			           EndOfPackerHandler *eop);
+			           EndOfPacketHandler *eop);
   void SetUserHandler(void (*foo)(int,int,int,int,int,short *));
   void SetUserHandler(ReceiverHandler* handler);
   void Start();
@@ -124,7 +124,7 @@ private:
   /*! \brief User provided identifier                                */
   void                    *mUi;
   /*! \brief Begin of packet user handler                            */
-  StartOfPackerHandler    *mStartOfPackerHandler;
+  StartOfPacketHandler    *mStartOfPacketHandler;
   /*! \brief Normal packet user handler (zero supressed)             */
   PacketHandler           *mPacketHandler;
   /*! \brief Cluster sum packet user handler (zero supressed)        */
@@ -132,7 +132,7 @@ private:
   /*! \brief Raw packet (non zero suppressed user handler)           */
   RawPacketHandler        *mPacketRawHandler;
   /*! \brief End of packet user handler                              */
-  EndOfPackerHandler      *mEndOfPackerHandler;
+  EndOfPacketHandler      *mEndOfPacketHandler;
   
   int      payloadLength;
 
