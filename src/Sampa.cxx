@@ -22,14 +22,10 @@ Sampa::Sampa(uint16_t addr) : mHaddr(addr),
 			      mCurLen(0)
 {
   ResetFrame();  // make room for header
-//  mChannel = 0;    // channel 0 is default
-//  mDataAvailable = false;        // no serial data available;
-//  mCurSendFrame = (uint16_t *)0; // no current frame being sent
 }
 
 Sampa::~Sampa()
 {
-  cout <<"Sampa " << (int)mHaddr << " deleted " << endl; 
 }
 
 void Sampa::SelectChannel(const uint8_t chid)

@@ -32,7 +32,6 @@ DualSampa::DualSampa(uint16_t addr1,uint16_t addr2)
 
 DualSampa::~DualSampa()
 {
-  cout <<"DualSampa deleted " << endl; 
   //
   // release sampas objects
   //
