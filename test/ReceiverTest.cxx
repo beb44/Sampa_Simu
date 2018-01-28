@@ -7,7 +7,7 @@
 #include <thread>
 #include <array>
 #define BOOST_TEST_INCLUDED
-#define BOOST_TEST_MODULE test module name
+#define BOOST_TEST_MODULE Sampa Simu Tests
 #include <boost/test/included/unit_test.hpp>
 #include <boost/test/unit_test.hpp> 
 #include <boost/test/framework.hpp>
@@ -22,7 +22,6 @@ int processed_data_count;
 int processed_clustersum_count;
 int processed_data_begin_count;
 int processed_data_end_count;
-
 DualSampa *CurrentDualSampa;
 
 void ReceiverTestRecHandler(void * ui,int addr,int ch,int nbsamp,int ts, short *buff)
@@ -492,6 +491,8 @@ ReceiverTestDirtyTraffic tester(rand()%200000+1);
   BOOST_ASSERT(rec.Joinable()             == false);
 
 }
+int ReceiverEnduranceRecDataElt;
+int ReceiverEnduranceSentDataElt;
 
 void TrafficGenerator(int ref)
 {
@@ -519,6 +520,7 @@ void TrafficGenerator(int ref)
 	buffer[1] = rand()%200;
         CurrentDualSampa->AddData(chip,nb+2,buffer);
 	credit += (rand()%100);
+	ReceiverEnduranceSentDataElt++;
       }
       if (somethingtosend) {
         CurrentDualSampa->SendFrames();
@@ -528,16 +530,16 @@ void TrafficGenerator(int ref)
   CurrentDualSampa->RegenerateData(); 
   return;
 }
-int ReceiverEnduranceRecPacket;
 void ReceiverEnduranceTestHandler(void * ui,int addr,int ch,int nbsamp,int ts, short *buff)
 {
   BOOST_ASSERT((addr == 11) || (addr == 7));
   BOOST_ASSERT((0<=ch) && (ch<32));
-  ReceiverEnduranceRecPacket++;
+  ReceiverEnduranceRecDataElt++;
 }
 BOOST_AUTO_TEST_CASE(ReceiverEnduranceTest)
 {
-  ReceiverEnduranceRecPacket = 0;
+  ReceiverEnduranceRecDataElt  = 0;
+  ReceiverEnduranceSentDataElt =0;
   CurrentDualSampa = new DualSampa(7,11);
   Receiver rec(*CurrentDualSampa,0,NULL,
                                    ReceiverEnduranceTestHandler,
@@ -545,7 +547,8 @@ BOOST_AUTO_TEST_CASE(ReceiverEnduranceTest)
   CurrentDualSampa->SetDataProvider(TrafficGenerator);
   regeneration_count = 10000;
   rec.Process();
-  std::cout << ReceiverEnduranceRecPacket << std::endl;
+  BOOST_ASSERT(ReceiverEnduranceSentDataElt != 0);
+  BOOST_ASSERT(ReceiverEnduranceSentDataElt == ReceiverEnduranceRecDataElt);
   delete CurrentDualSampa;
 }
 
