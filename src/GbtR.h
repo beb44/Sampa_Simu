@@ -30,7 +30,6 @@ public:
   bool    Fetch(int const port,int const sample) ;
   uint8_t Read(int const port,int const sample)
   {
-  //  return mCurWord[(sample>>1)-mOffset].Get((port<<1)+(1-(sample & 1)));
     return mCurWord[(sample>>1)-mOffset].Get((port<<1)+((~sample) & 1));
   };
   void    Push(Bits128 word);

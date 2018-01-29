@@ -91,107 +91,62 @@ void GbtR::Push(Bits128 word)
 
 bool GbtR::Fetch(int const port,int const sample) 
 {
- #if ONTHEFLY     
-  mMutex.lock();
-//  if ((sample/2) < (mCurSample+mOffset)) {
   if ((sample/2) < (mCurSample+mOffset)) {
-    //
-    // a Gbt word carries two bits of information
-    // in this case, the current sample is already available
-    // and has been 'fetch' along the preceeding one.
+    return true;
+  }
+  mMutex.lock();
+  // we run out of memory, wait for all other process to reach the
+  // same point
+  //cout << "GbtR::Fetch " << mCurSample <<" "<<mOffset<<  " " << sample << endl;
+  mNbSampleReaders--;
+  if (mNbSampleReaders != 0) {
+    // 
+    // some readers are out of synchronisation, let' wait for them
+    // suspend task
     //
     mMutex.unlock();
-    return true;
-  }
-#else
-  if ((sample/2) < (mCurSample+mOffset)) {
-    return true;
-  }
-  mMutex.lock();
-#endif
-  //
-  // At the stage, the GBT word has not been read yet, check if all
-  // readers are synchronised before fetching it
-  //
-//  if ((sample/2) == (mOffset+mWindowsize-1))
-  if (1)
-  {
-    // we run out of memory, wait for all other process to reach the
-    // same point
-    //cout << "GbtR::Fetch " << mCurSample <<" "<<mOffset<<  " " << sample << endl;
-    mNbSampleReaders--;
-    if (mNbSampleReaders != 0) {
-      // 
-      // some readers are out of synchronisation, let' wait for them
-      // suspend task
-      //
-      mMutex.unlock();
-      mElinkMap[port]->lock() ;
-      //
-      // returns data availability when all readers are synchronised
-      //
+    mElinkMap[port]->lock() ;
+    //
+    // returns data availability when all readers are synchronised
+    //
     return mDataAvailable;
-    }
-    else {
-      //
-      // The last readers is now synchronised, let's get the GBT word
-      // from the distant party and release all pending readers
-      //
-      // fecth a new word
-      //
-#if ONTHEFLY     
-      mDataAvailable= mDataProvider.GbtWordAvailable();
-      if (mDataAvailable) {
-        mCurWord[0] = mDataProvider.GetWord();
-	mOffset += mWindowsize;
-        mCurSample = 0;
-        mNbSampleReaders = mNbLinks;
-      }
-#else
-      mCurSample = 0;
-      while (mDataProvider.GbtWordAvailable()){
-        if (mCurSample == mWindowsize) break;
-	mCurWord[mCurSample] = mDataProvider.GetWord();
-	mCurSample++;
-      }
-      mOffset = mPOffset;
-      mPOffset += mCurSample;
-      mNbSampleReaders = mNbLinks;
-      mDataAvailable= mDataProvider.GbtWordAvailable();
-    
-#endif
-      //
-      // free all waiting thread (but ourself)
-      //
-      for (std::map<int,GbtElink *>::iterator it = mElinkMap.begin();it !=mElinkMap.end();it++) {
-//      for (int i=0; i< mNbLinks;i++) { 
-        if (it->first != port) 
-          it->second->unlock() ; 
-      }
-      mMutex.unlock(); // end on critical section
-      if (mDataAvailable == false)
-      {
-        cout <<"wwww" <<endl;
-        mNbLinks--;
-      }
-      return mDataAvailable;
-    }
   }
   else {
-    // windows is not full, catch a new word
-    mDataAvailable= mDataProvider.GbtWordAvailable();
-    if (mDataAvailable) {
-      mCurSample ++;
+    //
+    // The last readers is now synchronised, let's get the GBT word
+    // from the distant party and release all pending readers
+    //
+    // fecth a new page
+    //
+    mCurSample = 0;
+    while (mDataProvider.GbtWordAvailable()){
+      if (mCurSample == mWindowsize) 
+      { 
+        break;
+      }
       mCurWord[mCurSample] = mDataProvider.GetWord();
+      mCurSample++;
+    }
+    mOffset = mPOffset;
+    mPOffset += mCurSample;
+    mNbSampleReaders = mNbLinks;
+   // mDataAvailable= mDataProvider.GbtWordAvailable();
+    mDataAvailable = (mCurSample != 0);
+    
+    //
+    // free all waiting thread (but ourself)
+    //
+    for (std::map<int,GbtElink *>::iterator it = mElinkMap.begin();it !=mElinkMap.end();it++) {
+      if (it->first != port) 
+        it->second->unlock() ; 
     }
     mMutex.unlock(); // end on critical section
     if (mDataAvailable == false)
     {
-      cout <<"wwww" <<endl;
       mNbLinks--;
     }
     return mDataAvailable;
-  }    
+  }
 }
 /*!
  *  \brief Read a bit on a given port
