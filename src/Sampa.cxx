@@ -56,7 +56,7 @@ void Sampa::ResetFrame()
 void Sampa::AddData(int const len, uint16_t const *data)
 {
   // append data to the crrent frame
-  memcpy(mFrame+mWPointer,data,sizeof(data)*len);
+  memcpy(mFrame+mWPointer,data,sizeof(*data)*len);
   mWPointer += len;
 }
 

@@ -20,6 +20,7 @@
 int regeneration_count;
 int processed_data_count;
 int processed_clustersum_count;
+int processed_rawdata_count;
 int processed_data_begin_count;
 int processed_data_end_count;
 DualSampa *CurrentDualSampa;
@@ -82,6 +83,10 @@ std::string TestCase = boost::unit_test::framework::current_test_case().p_name;
   }
 }
 
+void ReceiverTestRecRawPacketHandler(void *ui,int addr,int ch,int len,short *buff)
+{
+  processed_rawdata_count++;
+}
 void ReceiverTestBeginOfPacketHandler(void *ui,uint64_t header)
 {
     processed_data_begin_count++;
@@ -183,11 +188,13 @@ BOOST_AUTO_TEST_CASE(CheckOneDataElementReception)
   regeneration_count = 1;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count == 1);
   BOOST_ASSERT(processed_clustersum_count == 0);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   delete CurrentDualSampa;
 }
 
@@ -200,12 +207,33 @@ BOOST_AUTO_TEST_CASE(CheckOneDataClusterSumElementReception)
   regeneration_count = 1;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count == 0);
   BOOST_ASSERT(processed_clustersum_count == 1);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == 0);
+  delete CurrentDualSampa;
+}
+
+BOOST_AUTO_TEST_CASE(CheckOneRawDataElementReception)
+{
+  
+  CurrentDualSampa = new DualSampa(1,2);
+  Receiver rec(*CurrentDualSampa,0,NULL,ReceiverTestRecRawPacketHandler,NULL);
+  CurrentDualSampa->SetDataProvider(DspHandler);
+  regeneration_count = 1;
+  processed_clustersum_count = 0;
+  processed_data_count       = 0;
+  processed_rawdata_count    = 0;
+  processed_data_begin_count = 0;
+  processed_data_end_count   = 0;
+  rec.Process();
+  BOOST_ASSERT(processed_data_count == 0);
+  BOOST_ASSERT(processed_clustersum_count == 0);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   delete CurrentDualSampa;
 }
 
@@ -219,10 +247,12 @@ BOOST_AUTO_TEST_CASE(CheckTwoDataElementReception)
   processed_clustersum_count = 0;
   processed_data_count       = 0;
   processed_data_begin_count = 0;
+  processed_rawdata_count    = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count       == 2);
   BOOST_ASSERT(processed_clustersum_count == 0);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == 0);
   BOOST_ASSERT(processed_data_end_count   == 0);
   
@@ -238,11 +268,13 @@ BOOST_AUTO_TEST_CASE(CheckTwoDataClusterSumElementReception)
   regeneration_count = 1;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count       == 0);
   BOOST_ASSERT(processed_clustersum_count == 2);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == 0);
   BOOST_ASSERT(processed_data_end_count   == 0);
   delete CurrentDualSampa;
@@ -257,11 +289,13 @@ BOOST_AUTO_TEST_CASE(CheckNoDataElementReception)
   regeneration_count = 10;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count       == 0);
   BOOST_ASSERT(processed_clustersum_count == 0);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == 0);
   BOOST_ASSERT(processed_data_end_count   == 0);
   delete CurrentDualSampa;
@@ -276,11 +310,13 @@ BOOST_AUTO_TEST_CASE(CheckNoDataClusterSumElementReception)
   regeneration_count = 5;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count       == 0);
   BOOST_ASSERT(processed_clustersum_count == 0);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == 0);
   BOOST_ASSERT(processed_data_end_count   == 0);
   delete CurrentDualSampa;
@@ -297,11 +333,13 @@ BOOST_AUTO_TEST_CASE(CheckBeginOfPacketReception1)
   regeneration_count = 1;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count       == 1);
   BOOST_ASSERT(processed_clustersum_count == 0);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == 1);
   BOOST_ASSERT(processed_data_end_count   == 0);
   delete CurrentDualSampa;
@@ -318,11 +356,13 @@ BOOST_AUTO_TEST_CASE(CheckBeginOfPacketReception2)
   regeneration_count = 1;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count       == 0);
   BOOST_ASSERT(processed_clustersum_count == 1);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == 1);
   BOOST_ASSERT(processed_data_end_count   == 0);
   delete CurrentDualSampa;
@@ -339,11 +379,13 @@ BOOST_AUTO_TEST_CASE(CheckEndOfPacketReception1)
   regeneration_count = 1;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count       == 1);
   BOOST_ASSERT(processed_clustersum_count == 0);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == 0);
   BOOST_ASSERT(processed_data_end_count   == 1);
   delete CurrentDualSampa;
@@ -360,11 +402,13 @@ BOOST_AUTO_TEST_CASE(CheckEndOfPacketReception2)
   regeneration_count = 1;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count       == 0);
   BOOST_ASSERT(processed_clustersum_count == 1);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == 0);
   BOOST_ASSERT(processed_data_end_count   == 1);
   delete CurrentDualSampa;
@@ -381,11 +425,13 @@ int  loop = 1+rand()%10;
   regeneration_count = loop;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count       == loop*2);
   BOOST_ASSERT(processed_clustersum_count == 0);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == loop);
   BOOST_ASSERT(processed_data_end_count   == loop);
   delete CurrentDualSampa;
@@ -404,11 +450,13 @@ int  loop = 1+rand()%10;
   regeneration_count         = loop;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Process();
   BOOST_ASSERT(processed_data_count       == 0);
   BOOST_ASSERT(processed_clustersum_count == loop*2);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == loop);
   BOOST_ASSERT(processed_data_end_count   == loop);
   delete CurrentDualSampa;
@@ -425,12 +473,14 @@ BOOST_AUTO_TEST_CASE(CheckThreadModeNoTraffic)
   regeneration_count         = 0;
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Start();
   rec.Join();
   BOOST_ASSERT(processed_data_count       == 0);
   BOOST_ASSERT(processed_clustersum_count == 0);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == 0);
   BOOST_ASSERT(processed_data_end_count   == 0);
   BOOST_ASSERT(rec.Joinable()             == false);
@@ -449,12 +499,14 @@ int  loop = 1+rand()%10;
   CurrentDualSampa->SetDataProvider(DspHandler);
   processed_clustersum_count = 0;
   processed_data_count       = 0;
+  processed_rawdata_count    = 0;
   processed_data_begin_count = 0;
   processed_data_end_count   = 0;
   rec.Start();
   rec.Join();
   BOOST_ASSERT(processed_data_count       == 0);
   BOOST_ASSERT(processed_clustersum_count == 0);
+  BOOST_ASSERT(processed_rawdata_count    == 0);
   BOOST_ASSERT(processed_data_begin_count == 0);
   BOOST_ASSERT(processed_data_end_count   == 0);
   BOOST_ASSERT(rec.Joinable()             == false);

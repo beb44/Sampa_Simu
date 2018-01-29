@@ -86,7 +86,6 @@ void DualSampa::SelectChannel(const uint8_t sId,const uint8_t chid)
   if ((sId == 0) || (sId == 1)) {
     mSampas[sId]->SelectChannel(chid);
   }
- 
 }
 /*!
  *  \brief starts a new frame
