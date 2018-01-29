@@ -99,6 +99,7 @@ uint8_t bit1;
 uint8_t bit2;
 GBits128 *mCurWord = MyQueue.Alloc();
   //int j=0;
+  if (mNbRec == 0) return false;
   for (int i=0;i<mMaxSocket;i++) {
     if (mElinkMap[i] != 0) {
       //
@@ -108,8 +109,6 @@ GBits128 *mCurWord = MyQueue.Alloc();
       bit1 = mElinkMap[i]->GetSerial();
       if (!(mElinkMap[i]->SerialAvailable())) continue;
       bit2 = mElinkMap[i]->GetSerial();
-      //mCurWord.w[i*2]= bit2;
-      //mCurWord.w[i*2+1]= bit1;
      
       mCurWord->word.Set(i*2,bit2 & 1);
       mCurWord->word.Set(i*2+1, bit1 & 1);

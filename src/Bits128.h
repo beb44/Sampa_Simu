@@ -17,6 +17,13 @@ public:
     w[2]= m2;
     w[3]= m3;
   };
+  bool operator==(Bits128 word)
+  {
+    return ((w[0]==word.w[0]) &&
+            (w[1]==word.w[1]) &&
+	    (w[2]==word.w[2]) &&
+	    (w[3]==word.w[3]));
+  }
   /*!
    * \brief return bit value at pos
    *

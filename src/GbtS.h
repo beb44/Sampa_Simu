@@ -25,6 +25,10 @@ struct GBits128
   class Queue
   {
   public:
+    Queue():QueueH(NULL),
+            QueueT(NULL)
+    {
+    }
     GBits128 *Alloc()
     {
       if (QueueF==NULL)
