@@ -18,7 +18,8 @@ GbtR::GbtR(gbtlink &provider) :mDataProvider(provider),
 			       //mCurWord(Bits128()),
 			       mOffset(0),
 			       mPOffset(0),
-			       mDataAvailable(false)
+			       mDataAvailable(false),
+			       mRecNumber(0)
 {
   mElinkMap.clear();
 }
