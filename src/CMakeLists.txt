@@ -39,6 +39,9 @@ add_library(sampareceiver SHARED
         )
 target_link_libraries(sampareceiver PUBLIC sampabase Threads::Threads)
 
+add_executable(DateReader DateReader.cxx DateParser.cxx)
+target_link_libraries(DateReader sampareceiver)
+
 add_executable(sampaMain main.cxx test.cxx)
 target_link_libraries(sampaMain sampasender sampareceiver)
 
