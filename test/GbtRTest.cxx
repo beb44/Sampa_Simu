@@ -144,7 +144,7 @@ BOOST_AUTO_TEST_CASE(GbtROneReceiverNoData)
 GbtR gbtr(GBTR_checker);
 
   GBTR_checker.setNbWords(0);
-  Elink &MyLink = gbtr.GetElink(0,NULL);
+  Elink &MyLink = gbtr.GetElink(NULL,0);
   BOOST_ASSERT(MyLink.SerialAvailable() == false);   
 }
 
@@ -156,7 +156,7 @@ int nbrecbit;
 GbtR gbtr(GBTR_checker);
 
   GBTR_checker.setNbWords(8192);
-  Elink &MyLink = gbtr.GetElink(0,NULL);
+  Elink &MyLink = gbtr.GetElink(NULL,0);
   nbrecbit =0;
   while (MyLink.SerialAvailable()) {
     MyLink.GetSerial();
@@ -183,7 +183,7 @@ int nbrecbit;
 GbtR gbtr(GBTR_checker);
 
   GBTR_checker.setNbWords(8193);
-  Elink &MyLink = gbtr.GetElink(0,NULL);
+  Elink &MyLink = gbtr.GetElink(NULL,0);
   nbrecbit =0;
   while (MyLink.SerialAvailable()) {
     MyLink.GetSerial();
@@ -199,7 +199,7 @@ int nbrecbit;
 GbtR gbtr(GBTR_checker);
 
   GBTR_checker.setNbWords(8191);
-  Elink &MyLink = gbtr.GetElink(0,NULL);
+  Elink &MyLink = gbtr.GetElink(NULL,0);
   nbrecbit =0;
   while (MyLink.SerialAvailable()) {
     MyLink.GetSerial();
