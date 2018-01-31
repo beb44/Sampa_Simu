@@ -1,6 +1,8 @@
 #ifndef SAMPA
 #define SAMPA
+#include <stdlib.h>   
 #include <cstdint>
+#include <string.h>
 #include <list>
 #include "SampaElink.h"
 /*!
@@ -11,6 +13,63 @@
  */
 class Sampa  : public SampaElink
 {
+  class Queue
+  {
+  struct InternalItem 
+  {
+    uint16_t            *buffer;
+    struct InternalItem *next;
+  } ;
+  
+  public:
+    Queue():QueueH(NULL),
+            QueueT(NULL),
+	    mSize(0)
+    {
+    }
+    
+    void push_back(uint16_t *bf)
+    {
+      InternalItem *ni = new InternalItem;
+      ni->buffer = bf;
+      ni->next = NULL;
+      if (QueueH == NULL) {
+        QueueH = ni;
+        QueueT = ni;
+      }
+      else {
+       QueueT->next = ni;
+       QueueT = ni;
+      }
+      mSize++;
+    }
+     void pop_front()
+    {
+      InternalItem *ret = QueueH; 
+      QueueH = QueueH->next;
+      if (QueueH == NULL) QueueT = NULL;
+      free(ret);
+      mSize--;
+      return ;
+    }
+    
+    uint16_t *front()
+    {
+      return QueueH->buffer;
+    }
+    
+    int size()
+    {
+      return (mSize);
+    }
+    private:
+      /*! \brief Sending queue head                                    */
+      InternalItem        *QueueH;
+      /*! \brief Sending queue tail                                    */
+      InternalItem        *QueueT;
+      int                 mSize;
+  };
+    
 public:
   explicit Sampa(uint16_t addr); 
   ~Sampa();
@@ -44,7 +103,8 @@ private:
   bool      mHasHeader;
   
   /*! \brief sending queue                                           */
-  std::list<uint16_t *>  mSendList;
+  //std::list<uint16_t *>  mSendList;
+  Queue                    mSendList;
   
   /*! \brief true if some data is available                          */
   bool      mDataAvailable;

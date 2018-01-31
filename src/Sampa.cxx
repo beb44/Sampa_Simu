@@ -161,11 +161,12 @@ uint16_t  *_fp = mFrame;
  */
 bool Sampa::SerialAvailable()
 {
+  if (mCurSendFrame !=0) return true;
   if (mSendList.size() != 0)
     mDataAvailable = true;
   return mDataAvailable;
 }
-
+ 
 uint8_t Sampa::GetSerial()
 {
 uint8_t  res;

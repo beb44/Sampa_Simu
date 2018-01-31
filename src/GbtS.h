@@ -45,10 +45,10 @@ struct GBits128
     
     void EnQueue(GBits128 *ret)
     {
+      ret->next = NULL;
       if (QueueH == NULL) {
         QueueH = ret;
         QueueT = ret;
-	ret->next = NULL;
       }
       else {
        QueueT->next = ret;
