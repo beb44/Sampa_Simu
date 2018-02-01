@@ -51,8 +51,40 @@ Elink &GbtR::GetElink(RecInterface *rec,int const port)
   //
   return *mElinkMap[port];
 }
+/*!
+ *  \brief Start the receiver processing loop in a thread
+ *
+ */
 
 void GbtR::Start()
+{
+  try {
+  TheThread = new std::thread(&GbtR::Process,this);
+  }
+  catch (const std::exception& e) {
+    throw;
+  }
+}
+
+/*!
+ *  \brief Waits for the receiver processing loop to terminate
+ *
+ */
+void GbtR::Join()
+{
+  TheThread->join();
+}
+
+/*!
+ *  \brief Check the thread still exist
+ *
+ */
+bool GbtR::Joinable()
+{
+  return TheThread->joinable();
+}
+
+void GbtR::Process()
 {
   while (mDataProvider.GbtWordAvailable()) {
     Push(mDataProvider.GetWord());

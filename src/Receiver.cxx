@@ -278,6 +278,7 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
  *
  */
 
+
 void Receiver::Start()
 {
   try {
@@ -306,6 +307,7 @@ bool Receiver::Joinable()
 {
   return TheThread->joinable();
 }
+
 void Receiver::SetUserHandler(void (*foo)(int,int,int,int,int,short *))
 {
   user_handler=foo;

@@ -1,6 +1,7 @@
 #ifndef GBTR
 #define GBTR
 #include <bitset>
+#include <thread>
 #include <map>
 #include <mutex>
 #include <condition_variable>
@@ -33,7 +34,10 @@ public:
     return mCurWord[(sample>>1)-mOffset].Get((port<<1)+((~sample) & 1));
   };
   void    Push(Bits128 word);
-  void    Start();
+  void Start();
+  void Join();
+  bool Joinable();
+  void Process();
 private:
   /*! \brief Reference of the data provider (i.e. remote GbtS)       */
   gbtlink                      &mDataProvider; 
@@ -65,5 +69,7 @@ private:
   //std::map<int,RecInterface *> mRec;
   RecRecord                    *mRec[40];
   int                          mRecNumber;  
+  /*! \brief thread object                                           */
+  std::thread  *TheThread;
 };
 #endif

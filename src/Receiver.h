@@ -73,9 +73,11 @@ public:
 			           EndOfPacketHandler *eop);
   void SetUserHandler(void (*foo)(int,int,int,int,int,short *));
   void SetUserHandler(ReceiverHandler* handler);
+
   void Start();
   void Join();
   bool Joinable();
+
   void Push(uint8_t data);
   void Process();
   void ProcessData(uint8_t word);

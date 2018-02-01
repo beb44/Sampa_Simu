@@ -61,15 +61,15 @@ DateParser dr(filename);
 GbtR       gbt_r1(dr);
 Receiver   rec(0,gbt_r1,NULL,NULL,rec_handler,NULL);
 Receiver   rec1(1,gbt_r1,NULL,NULL,rec_handler,NULL);
-//Receiver rec2(2,gbt_r1,NULL,NULL,rec_handler,NULL);
+Receiver rec2(2,gbt_r1,NULL,NULL,rec_handler,NULL);
 
-   rec.Start(); 
-   rec1.Start(); 
+   //rec.Start(); 
+   //rec1.Start(); 
    //rec2.Start(); 
-   rec.Join(); 
-   rec1.Join();
+   //rec.Join(); 
+   //rec1.Join();
    //rec2.Join();
-   //gbt_r1.Start(); 
+   gbt_r1.Process(); 
    dr.Display();
    display();
 }
