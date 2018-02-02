@@ -43,7 +43,9 @@ public:
     
     uint64_t    BuildSync();
     
+    uint8_t     GetPacketType();
     uint8_t     GetPacketType(uint64_t head);
+    uint16_t    GetNbWords();
     uint16_t    GetNbWords(uint64_t head);
 private:
     uint64_t    InternRawHead;

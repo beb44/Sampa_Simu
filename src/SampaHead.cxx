@@ -54,12 +54,18 @@ uint64_t SampaHead::BuildSync()
    mFPayloadParity        = 0; 
    return Build();
  }
-
+uint8_t SampaHead::GetPacketType()
+{
+  return ((InternRawHead & PKGTYPE_MASK) >> PKGTYPE_OFFSET);
+}
 uint8_t SampaHead::GetPacketType(uint64_t head)
 {
   return ((head & PKGTYPE_MASK) >> PKGTYPE_OFFSET);
 }
-
+uint16_t SampaHead::GetNbWords()
+{
+  return ((InternRawHead & NBWORD_MASK) >> NBWORD_OFFSET);
+}
 uint16_t SampaHead::GetNbWords(uint64_t head)
 {
   return ((head & NBWORD_MASK) >> NBWORD_OFFSET);
