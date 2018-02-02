@@ -11,6 +11,7 @@ typedef void (PacketHandler)(void *ui,int addr,int ch,int nbsamp,int ts,short *b
 typedef void (RawPacketHandler)(void *ui,int addr,int ch,int len,short *buff);
 typedef void (StartOfPacketHandler)(void *ui,uint64_t header);
 typedef void (EndOfPacketHandler)(void *ui);
+typedef void (NonPacketHandler)(void *ui,uint64_t header,int addr,int ch,int len,short *buff);
 class ReceiverHandler 
 {
 public:
@@ -34,6 +35,9 @@ class Receiver : public RecInterface
     Stats();
     void ResetStats();
     void DisplayStats();
+    int  GetPacketCount();
+    int  GetPacketCountByType(int type);
+    
     
     /*! \brief total number of received packets                      */
     uint32_t  mPacketCount;
@@ -73,7 +77,7 @@ public:
 			           EndOfPacketHandler *eop);
   void SetUserHandler(void (*foo)(int,int,int,int,int,short *));
   void SetUserHandler(ReceiverHandler* handler);
-
+  void SetNonDataPacketHandler(NonPacketHandler *handler);
   void Start();
   void Join();
   bool Joinable();
@@ -83,6 +87,7 @@ public:
   void ProcessData(uint8_t word);
   void DisplayStats();
   void ResetStats();
+  Stats &GetStats();
 private:
   /*! \brief remote party                                            */
   Elink     &mPeer;
@@ -108,8 +113,10 @@ private:
   int       mHeadcd;
   /*! \brief next bit position curent payload word                   */
   int       mCurBit;
-  /*! \brief current word under construction                         */
+  /*! \brief current word len under construction                     */
   uint16_t  mCurLen;
+  /*! \brief current word under construction                         */
+  uint16_t  mCurWord;
   /*! \brief pointer in the reception word buffer                    */
   uint16_t  *mWPointer;
   /*! \brief reception word buffer                                   */
@@ -136,6 +143,7 @@ private:
   /*! \brief End of packet user handler                              */
   EndOfPacketHandler      *mEndOfPacketHandler;
   
+  NonPacketHandler        *mNonDataPacketHandler;
   int      payloadLength;
 
 };

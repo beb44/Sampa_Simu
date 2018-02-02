@@ -4,21 +4,6 @@
 #include "Receiver.h" 
 
 using namespace std;
-#if 0 
-Receiver::Receiver()
-{  
-  mPeer = (elink *)0;
-  mIsSynced = false;
-  mSyncPos = 0;
-  mSyncHead = SampaHead().BuildSync();
-  mCurHead = 0;
-  user_handler = 0;
-  mRecHandl = 0;
-#ifdef STATS
-  reset_stats();
-#endif
-}
-#endif
 /*!
  *  \brief Constructor
  *
@@ -40,6 +25,7 @@ Receiver::Receiver(Elink &provider) : mPeer(provider),
 {  
   user_handler = 0;
   mRecHandl = 0;
+  mStats.ResetStats();
 }
 
 /*!
@@ -70,10 +56,12 @@ Receiver::Receiver(Elink &provider,void *ui,
 		                      mPacketHandler(ph),
 		                      mClusterSumPacketHandler(NULL),
 		                      mPacketRawHandler(NULL),
-		                      mEndOfPacketHandler(eop)
+		                      mEndOfPacketHandler(eop),
+				      mNonDataPacketHandler(NULL)
 {  
   user_handler = 0;
   mRecHandl = 0;
+  mStats.ResetStats();
 }
 
 /*!
@@ -104,10 +92,12 @@ Receiver::Receiver(Elink &provider,void *ui,
 		                      mPacketHandler(NULL),
 		                      mClusterSumPacketHandler(ph),
 		                      mPacketRawHandler(NULL),
-		                      mEndOfPacketHandler(eop)
+		                      mEndOfPacketHandler(eop),
+				      mNonDataPacketHandler(NULL)
 {  
   user_handler = 0;
   mRecHandl = 0;
+  mStats.ResetStats();
 }
 
 /*!
@@ -138,10 +128,12 @@ Receiver::Receiver(Elink &provider, void *ui,
 		                      mPacketHandler(NULL),
 		                      mClusterSumPacketHandler(NULL),
 		                      mPacketRawHandler(ph),
-		                      mEndOfPacketHandler(eop)
+		                      mEndOfPacketHandler(eop),
+				      mNonDataPacketHandler(NULL)
 {  
   user_handler = 0;
   mRecHandl = 0;
+  mStats.ResetStats();
 }
 
 /*!
@@ -162,10 +154,12 @@ Receiver::Receiver(int port,GbtR &provider):
 		                      mPacketHandler(NULL),
 		                      mClusterSumPacketHandler(NULL),
 		                      mPacketRawHandler(NULL),
-		                      mEndOfPacketHandler(NULL)
+		                      mEndOfPacketHandler(NULL),
+				      mNonDataPacketHandler(NULL)
 {
   user_handler = 0;
   mRecHandl = 0;
+  mStats.ResetStats();
 }
 
 /*!
@@ -193,14 +187,16 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
                                       mIsSynced(false),
 				      mSyncPos(0),
 				      mUi(ui),
-		                      mStartOfPacketHandler(NULL),
+		                      mStartOfPacketHandler(sop),
 		                      mPacketHandler(ph),
 		                      mClusterSumPacketHandler(NULL),
 		                      mPacketRawHandler(NULL),
-		                      mEndOfPacketHandler(NULL)
+		                      mEndOfPacketHandler(eop),
+				      mNonDataPacketHandler(NULL)
 {
   user_handler = 0;
   mRecHandl = 0;
+  mStats.ResetStats();
 }
 
 /*!
@@ -228,14 +224,16 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
                                       mIsSynced(false),
 				      mSyncPos(0),
 				      mUi(ui),
-		                      mStartOfPacketHandler(NULL),
+		                      mStartOfPacketHandler(sop),
 		                      mPacketHandler(NULL),
 		                      mClusterSumPacketHandler(ph),
 		                      mPacketRawHandler(NULL),
-		                      mEndOfPacketHandler(NULL)
+		                      mEndOfPacketHandler(eop),
+				      mNonDataPacketHandler(NULL)
 {
   user_handler = 0;
   mRecHandl = 0;
+  mStats.ResetStats();
 }
 /*!
  *  \brief Constructor
@@ -263,14 +261,16 @@ Receiver::Receiver(int port,GbtR &provider,void *ui,
                                       mIsSynced(false),
 				      mSyncPos(0),
 				      mUi(ui),
-		                      mStartOfPacketHandler(NULL),
+		                      mStartOfPacketHandler(sop),
 		                      mPacketHandler(NULL),
 		                      mClusterSumPacketHandler(NULL),
 		                      mPacketRawHandler(ph),
-		                      mEndOfPacketHandler(NULL)
+		                      mEndOfPacketHandler(eop),
+				      mNonDataPacketHandler(NULL)
 {
   user_handler = 0;
   mRecHandl = 0;
+  mStats.ResetStats();
 }
 
 /*!
@@ -285,8 +285,7 @@ void Receiver::Start()
   TheThread = new std::thread(&Receiver::Process,this);
   }
   catch (const std::exception& e) {
-    cout << "execption catched" << endl;
-    throw;
+    throw runtime_error("execption catched while strating Receiver");
   }
 }
 
@@ -306,6 +305,11 @@ void Receiver::Join()
 bool Receiver::Joinable()
 {
   return TheThread->joinable();
+}
+
+void Receiver::SetNonDataPacketHandler(NonPacketHandler *handler)
+{
+  mNonDataPacketHandler=handler;
 }
 
 void Receiver::SetUserHandler(void (*foo)(int,int,int,int,int,short *))
@@ -330,13 +334,23 @@ void Receiver::HandlePacket(const uint64_t header,int len,uint16_t *buffer)
 SampaHead  head_decoder(header);
 
   head_decoder.Decode(); 
-  //head_decoder.display();
+  if ((head_decoder.mFPkgType != 4) &&  (head_decoder.mFPkgType != 2)){
+    //
+    // non data packet and not sync
+    //
+    mNonDataPacketHandler(mUi,
+                          header,
+                          head_decoder.mFChipAddress,
+  		          head_decoder.mFChannelAddress,
+		          len,
+		          (short *)buffer);
+    return;		
+  }  
   if (mStartOfPacketHandler) mStartOfPacketHandler(mUi,header);
   if (mPacketHandler)
   {
     // parse packet
     int curpos = 0;
-    //int len;
     while (curpos < len)
     {
        mPacketHandler(mUi,
@@ -383,7 +397,7 @@ SampaHead  head_decoder(header);
 				 buffer[0],
 				 buffer[1],
 				 len,
-				 (short *)&buffer[2]);
+				 (short *)buffer);
 				
   if (mEndOfPacketHandler) mEndOfPacketHandler(mUi);
 
@@ -399,8 +413,6 @@ SampaHead  head_decoder(header);
 
 void Receiver::Process()
 {  
-//int      payloadLength=0;
-//int      packetType;
   payloadLength = 0;
   while (mPeer.SerialAvailable()) {
     ProcessData(mPeer.GetSerial());
@@ -410,62 +422,63 @@ void Receiver::Process()
 void Receiver::ProcessData(uint8_t word)
 {  
 int      packetType;
-//  while (mPeer.SerialAvailable()) {
-    if (mIsSynced) {
-      if (mHeadcd !=0) {
-        mCurHead = ((mCurHead >>1) + (((uint64_t)(word))<<49)) & 0x3ffffffffffff;
-        mHeadcd --;
-	if (mHeadcd ==0) { 
-	  // header fully loaded, get playload length
-	  payloadLength = SampaHead().GetNbWords(mCurHead);
-	  packetType    = SampaHead().GetPacketType(mCurHead);
-          mStats.mPacketCountByType[packetType]++;
-          mStats.mWordsCountByPacketType[packetType] += payloadLength+5;
-	  mStats.mPacketCount++;
-	  if (payloadLength == 0) {
-	    // zero length packet, catch next header
-	    mHeadcd = 50; // 50 bit of header to be read
-	  }
-	  else {
-	    // non empty packet, process
-	    mWPointer = &mFrame[0];
-            *mWPointer = 0;
-	    mCurLen = 0; mCurBit = 0; 
-	  }
-	}
-      }
-      else {
-        // data reception
-	*mWPointer =  ((*mWPointer) )+((uint64_t)(word)<<mCurBit);
-	mCurBit++;	
-        if (mCurBit==10) {
-          // all bits in current word have been sent out
-          mWPointer++;
-          *mWPointer = 0;
-          mCurBit = 0;
-	  mCurLen++;
-	  if (mCurLen == payloadLength)  {
-	     mHeadcd = 50; // 50 bit of header to be read
-	     HandlePacket(mCurHead,payloadLength,mFrame);
-	   }
-         }
-       }  
-    }
-    else {
-      mSyncPos++;
+
+  if (mIsSynced) {
+    if (mHeadcd !=0) {
       mCurHead = ((mCurHead >>1) + (((uint64_t)(word))<<49)) & 0x3ffffffffffff;
-      if (mCurHead == mSynchead) {
-	//m_curhead << "payload length " << payload_length << endl;
-        mIsSynced= true;
-	mHeadcd = 50; // 50 bit of header to be read
-	payloadLength = SampaHead().GetNbWords(mCurHead);
-	packetType    = SampaHead().GetPacketType(mCurHead);
+      mHeadcd --;
+      if (mHeadcd ==0) { 
+	// header fully loaded, get playload length
+	SampaHead SHeader(mCurHead); 
+	payloadLength = SHeader.GetNbWords();
+	packetType    = SHeader.GetPacketType();
         mStats.mPacketCountByType[packetType]++;
         mStats.mWordsCountByPacketType[packetType] += payloadLength+5;
 	mStats.mPacketCount++;
-      }	
+	if (payloadLength == 0) {
+	  // zero length packet, catch next header
+	  mHeadcd = 50; // 50 bit of header to be read
+	}
+	else {
+	  // non empty packet, process
+	  mWPointer = &mFrame[0];
+          mCurWord = 0;
+	  mCurLen = 0; mCurBit = 0; 
+        }
+      }
     }
-//  }  
+    else {
+      // data reception
+      mCurWord = mCurWord + ((uint64_t)(word)<<mCurBit);
+      //*mWPointer =  ((*mWPointer) )+((uint64_t)(word)<<mCurBit);
+      mCurBit++;	
+      if (mCurBit==10) {
+        // all bits in current word have been sent out
+        *mWPointer = mCurWord;
+        mWPointer++;
+        mCurWord = 0;
+        mCurBit = 0;
+	mCurLen++;
+	if (mCurLen == payloadLength)  {
+	  mHeadcd = 50; // 50 bit of header to be read
+	  HandlePacket(mCurHead,payloadLength,mFrame);
+	}
+      }
+    }  
+  }
+  else {
+    mSyncPos++;
+    mCurHead = ((mCurHead >>1) + (((uint64_t)(word))<<49)) & 0x3ffffffffffff;
+    if (mCurHead == mSynchead) {
+      mIsSynced= true;
+      mHeadcd = 50; // 50 bit of header to be read
+      payloadLength = SampaHead().GetNbWords(mCurHead);
+      packetType    = SampaHead().GetPacketType(mCurHead);
+      mStats.mPacketCountByType[packetType]++;
+      mStats.mWordsCountByPacketType[packetType] += payloadLength+5;
+      mStats.mPacketCount++;
+    }	
+  }
 }
 
 void Receiver::Push(uint8_t data)
@@ -483,6 +496,20 @@ Receiver::Stats::Stats() :mPacketCount(0)
       for (int i=0;i<8;i++) mWordsCountByPacketType[i]= 0;
     }
 
+Receiver::Stats &Receiver::GetStats() 
+{
+  return mStats;
+}
+int  Receiver::Stats::GetPacketCount()
+{
+  return mPacketCount;
+}
+
+int  Receiver::Stats::GetPacketCountByType(int type)
+{
+  if ((type<0) || (type>7)) return -1;
+  return mPacketCountByType[type];
+}
 /*!
  *  \brief Reset stats counters
  *
