@@ -110,6 +110,7 @@ std::string TestCase = boost::unit_test::framework::current_test_case().p_name;
   {
     if (regeneration_count==0) return;
     regeneration_count--;
+    CurrentDualSampa->RegenerateData(); 
     return;
   }
   if ((TestCase == std::string("CheckOneDataElementReception"))           ||
