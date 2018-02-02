@@ -8,3 +8,7 @@ add_executable(sampaTest
 	       GbtRTest.cxx
 	       GbtSTest.cxx)
 target_link_libraries(sampaTest sampasender sampareceiver )
+
+add_executable(sampaPerformance 
+               ReceiverPerformanceTest.cxx )
+target_link_libraries(sampaPerformance sampasender sampareceiver )
