@@ -11,18 +11,18 @@
  * The regular usage consists in generating a library link which provides 
  * methods (see interface.h). 
  *
- * \section Make Makefile usage
+ * \section Make Cmake
  *
- * The package comes along with a generic makefile which offers the following
- * options
- * - make (or make all): generates a runable main.out based on main.cpp contents
- * - make clean: remove all 'generated' object 
- * - make lib: generates the file Sampa.a 
- *
- * This Makefile automatically build the lists of source file and normally
- * one not need to modify it when creating new .cpp or .c file in the
- * src directory, these newly added object will be automatically 
- * included in the building process.
+ * Cmake configurations are delivered and provide automatic makefile
+ * generation facilities.\\
+ * Three base libraries are generated 
+ * - libsampabase.so
+ * - libsampasender.so
+ * - libsampareceiver.so
+ * Morever, it also generate a regression test suite program
+ * - sampaTest
+ * and a basic date event file reader
+ * - DateReader
  *
  * \section Inter Interface method usage
  *
