@@ -141,7 +141,6 @@ Bits128 testword(0,0,3,3);
   }  
   BOOST_ASSERT(gbts.GbtWordAvailable()==false);   
   for (int i=0;i<40;i++) delete  gbtscheck[i]; 
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()

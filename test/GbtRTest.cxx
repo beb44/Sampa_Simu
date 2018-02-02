@@ -172,7 +172,7 @@ GBTR_push MyLink;
 
   GBTR_checker.setNbWords(8192);
   gbtr.GetElink(&MyLink,0);
-  gbtr.Start();
+  gbtr.Process();
   BOOST_ASSERT(MyLink.mNbBits == 16384);   
 }
 
@@ -262,7 +262,7 @@ GbtR gbtr(GBTR_checker);
   {
     gbtr.GetElink(&MyLink[i],i);
   }
-  gbtr.Start();
+  gbtr.Process();
      
   for (int i=0;i<40;i++) BOOST_ASSERT(MyLink[i].mNbBits == 0);   
    
@@ -280,7 +280,7 @@ GbtR gbtr(GBTR_checker);
   {
     gbtr.GetElink(&MyLink[i],i);
   }
-  gbtr.Start();
+  gbtr.Process();
      
   for (int i=0;i<40;i++) BOOST_ASSERT(MyLink[i].mNbBits == 16384);      
 }
@@ -319,7 +319,7 @@ GbtR gbtr(GBTR_checkerInt);
     MyLink[i] = new GBTR_pushInt(i/16);
     gbtr.GetElink(MyLink[i],i);
   }
-  gbtr.Start();
+  gbtr.Process();
      
   for (int i=0;i<40;i++) delete MyLink[i];
    
